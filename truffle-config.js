@@ -18,8 +18,8 @@
  *
  */
 
-import { infuraKey, projectId } from './config'
-
+const config = require('./config.js')
+const projectId = config.projectId
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
