@@ -1,0 +1,22 @@
+{
+  "name": "cz4153-blockchain-project",
+  "version": "1.0.0",
+  "description": "This is a project for NTU's Blockchain course, CZ4153.",
+  "main": "config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huishun98/CZ4153-blockchain-project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/huishun98/CZ4153-blockchain-project/issues"
+  },
+  "homepage": "https://github.com/huishun98/CZ4153-blockchain-project#readme"
+}
