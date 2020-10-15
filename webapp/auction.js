@@ -22,3 +22,26 @@ export const getCurrentTokenPrice = async () => {
         console.log("Please install MetaMask!");
     }
 };
+
+export const getStage = async () => {
+    // Using MetaMask API to send transaction
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        const stage = contract.methods.updateStage().call()
+        return stage
+    } else {
+        console.log("Please install MetaMask!");
+    }
+};
+
+export const startAuction = async () => {
+    // Using MetaMask API to send transaction
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        const start = contract.methods.startAuction().call()
+        console.log({start})
+        return start
+    } else {
+        console.log("Please install MetaMask!");
+    }
+};

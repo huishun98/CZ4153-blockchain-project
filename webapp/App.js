@@ -1,5 +1,5 @@
 import React from "react";
-import { getCurrentTokenPrice } from "./auction.js"
+import { getCurrentTokenPrice, getStage, startAuction } from "./auction.js"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -14,16 +14,29 @@ class App extends React.Component {
       lastForBlocks: 100,
       strategy: localStorage.getItem("linearStrategyAddress") || null,
       // seller: this.accountService.currentAccount,
-      currentTokenPrice: 0
+      currentTokenPrice: 0,
+      stage: "unset"
     };
 
-    this.getCurrentTokenPrice = this.getCurrentTokenPrice.bind(this);
+    this._getCurrentTokenPrice = this._getCurrentTokenPrice.bind(this);
+    this._startAuction = this._startAuction.bind(this);
+    this._getStage = this._getStage.bind(this);
   }
 
 
-  getCurrentTokenPrice = async () => {
+  _getCurrentTokenPrice = async () => {
     let currentTokenPrice = await getCurrentTokenPrice();
     this.setState({ currentTokenPrice })
+  }
+
+  _startAuction = async () => {
+    let start = await startAuction()
+    // this.setState({ stage })
+  }
+
+  _getStage = async () => {
+    let stage = await getStage()
+    this.setState({ stage })
   }
 
 
@@ -34,7 +47,10 @@ class App extends React.Component {
           <div className="card-body">
             <h1 className="title">Dutch auction</h1>
             <p>Current token price is: {this.state.currentTokenPrice}</p>
-            <button className="btn btn-primary" onClick={this.getCurrentTokenPrice}>Update current token price</button>
+            <button className="btn btn-primary" onClick={this._getCurrentTokenPrice}>Update current token price</button>
+            <p>Current stage is: {this.state.stage}</p>
+            <button className="btn btn-secondary" onClick={this._getStage}>Update stage</button>
+            <button className="btn btn-secondary" onClick={this._startAuction}>Start auction</button>
           </div>
         </div>
       </div>

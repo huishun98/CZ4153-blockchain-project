@@ -88,7 +88,7 @@ contract DutchAuction {
     /// @param _wallet Gnosis wallet.
     /// @param _ceiling Auction ceiling.
     /// @param _priceFactor Auction price factor.
-    function DutchAuctionFunc(address payable _wallet, uint _ceiling, uint _priceFactor)
+    constructor(address payable _wallet, uint _ceiling, uint _priceFactor)
         public
     {
         if (_wallet == address(0) || _ceiling == 0 || _priceFactor == 0)
