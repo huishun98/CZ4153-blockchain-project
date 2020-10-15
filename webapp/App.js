@@ -1,75 +1,59 @@
 import React from "react";
-import {
-  updateDeposit,
-  newDeposit,
-  BankContractAddress,
-  Testnet,
-} from "./bank.js";
+import { getCurrentTokenPrice, getStage, startAuction } from "./auction.js"
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
 
 // example from doc: https://reactjs.org/docs/forms.html#controlled-components
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      queryInput: "",
-      depositInput: 0,
-      address: "0x0",
-      deposit: 0,
+      initialPrice: 2000,
+      itemName: "MacBook Pro 15",
+      reservePrice: 1000,
+      lastForBlocks: 100,
+      strategy: localStorage.getItem("linearStrategyAddress") || null,
+      // seller: this.accountService.currentAccount,
+      currentTokenPrice: 0,
+      stage: "unset"
     };
 
-    this.handleQueryChange = this.handleQueryChange.bind(this);
-    this.handleQuery = this.handleQuery.bind(this);
-    this.handleDepositChange = this.handleDepositChange.bind(this);
-    this.handleNewDeposit = this.handleNewDeposit.bind(this);
+    this._getCurrentTokenPrice = this._getCurrentTokenPrice.bind(this);
+    this._startAuction = this._startAuction.bind(this);
+    this._getStage = this._getStage.bind(this);
   }
-  handleQueryChange = (e) => {
-    this.setState({ queryInput: e.target.value });
-  };
-  handleQuery = async () => {
-    let result = await updateDeposit(this.state.queryInput);
-    this.setState({
-      address: result.address,
-      deposit: result.deposit,
-    });
-  };
-  handleDepositChange = (e) => {
-    this.setState({ depositInput: e.target.value });
-  };
-  handleNewDeposit = async () => {
-    await newDeposit(this.state.depositInput);
-  };
+
+
+  _getCurrentTokenPrice = async () => {
+    let currentTokenPrice = await getCurrentTokenPrice();
+    this.setState({ currentTokenPrice })
+  }
+
+  _startAuction = async () => {
+    let start = await startAuction()
+    // this.setState({ stage })
+  }
+
+  _getStage = async () => {
+    let stage = await getStage()
+    this.setState({ stage })
+  }
+
 
   render() {
     return (
-      <>
-        <h1>Welcome to Bank dApp</h1>
-        <p>Bank Contract Address: {BankContractAddress}</p>
-        <p>Network: {Testnet}</p>
-        <hr />
-        <input
-          type="text"
-          placeholder="Enter address to query"
-          value={this.state.value}
-          onChange={this.handleQueryChange}
-        />{" "}
-        <input type="submit" value="Query Deposit" onClick={this.handleQuery} />
-        <p>
-          Query Result: {this.state.address} has deposit of {this.state.deposit}{" "}
-          wei
-        </p>
-        <hr />
-        <input
-          type="text"
-          placeholder="Enter amount (in Ether)"
-          value={this.state.value}
-          onChange={this.handleDepositChange}
-        />{" "}
-        <input
-          type="submit"
-          value="New Deposit"
-          onClick={this.handleNewDeposit}
-        />
-      </>
+      <div className="container-fluid body">
+        <div className="card">
+          <div className="card-body">
+            <h1 className="title">Dutch auction</h1>
+            <p>Current token price is: {this.state.currentTokenPrice}</p>
+            <button className="btn btn-primary" onClick={this._getCurrentTokenPrice}>Update current token price</button>
+            <p>Current stage is: {this.state.stage}</p>
+            <button className="btn btn-secondary" onClick={this._getStage}>Update stage</button>
+            <button className="btn btn-secondary" onClick={this._startAuction}>Start auction</button>
+          </div>
+        </div>
+      </div>
     );
   }
 }
