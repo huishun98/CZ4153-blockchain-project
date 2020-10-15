@@ -5,7 +5,7 @@ import { infuraWSS } from './config'
 import {
     auctionAddress
 } from "./config.js"
-import artifact from "../build/contracts/DutchAuction.json"; // TODO CHANGE
+import artifact from "../build/contracts/Auction.json"; 
 
 const web3 = new Web3(
     Web3.currentProvider || new Web3.providers.WebsocketProvider(infuraWSS)
