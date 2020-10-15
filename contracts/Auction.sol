@@ -3,6 +3,7 @@ pragma solidty ^0.6.2;
 import "./HuiToken.sol";
 
 contract Auction {
+    //hello
     HuiToken public huiToken;
     address public owner;
     uint256 public weiRaised;
