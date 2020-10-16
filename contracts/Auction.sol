@@ -7,9 +7,6 @@ contract Auction {
     address public owner;
     address public wallet;
     uint256 public weiRaised;
-    address public justin = 0x123456;
-
-    justin.transfer(20);
 
     uint256 public openingRate;
     uint256 public currentRate;
@@ -79,31 +76,31 @@ contract Auction {
         closingTime = openingTime + 20 minutes;
     }
 
-    function stakeBid(address _beneficiary) public payable {
-        require(_beneficiary != address(0));
-        require(msg.value > 0, "amount cannot be 0 or less");
+    // function stakeBid(address _beneficiary) public payable {
+    //     require(_beneficiary != address(0));
+    //     require(msg.value > 0, "amount cannot be 0 or less");
 
-        weiRaised += msg.value;
+    //     weiRaised += msg.value;
 
-        if(IsBidding[_beneficiary] == true) {
-            totalBidAmt[_beneficiary] += msg.value;
-        }
+    //     if(IsBidding[_beneficiary] == true) {
+    //         totalBidAmt[_beneficiary] += msg.value;
+    //     }
 
-        else {
-            IsBidding[_beneficiary] = true;
-            totalBidAmt[_beneficiary] = msg.value;
-        }
+    //     else {
+    //         IsBidding[_beneficiary] = true;
+    //         totalBidAmt[_beneficiary] = msg.value;
+    //     }
         
-        emit BidStaked(_beneficiary, msg.value);
-    }
+    //     emit BidStaked(_beneficiary, msg.value);
+    // }
 
-    function claimTokens() external {
-        require(auctionEnded == true);
-        require(IsBidding[msg.sender] == true);
+    // function claimTokens() external {
+    //     require(auctionEnded == true);
+    //     require(IsBidding[msg.sender] == true);
 
-        uint weiAmount = BidStaked[msg.sender];
-        uint tokensOwed = weiAmount/closingRate;
-        huiToken.transfer(msg.sender, tokensOwed);
+    //     uint weiAmount = BidStaked[msg.sender];
+    //     uint tokensOwed = weiAmount/closingRate;
+    //     huiToken.transfer(msg.sender, tokensOwed);
 
-    }
+    // }
 }
