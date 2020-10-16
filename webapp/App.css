@@ -1,3 +1,9 @@
+:root {
+    --light-color: rgb(107, 107, 107);
+    --highlight-color: #EC7054;
+    --highlight-color-dark: #ec5c3b;
+}
+
 .body {
     background-image: url("assets/backdrop.jpg");
     background-position: center;
@@ -8,9 +14,10 @@
 }
 
 .card {
-    max-width: 400px;
+    max-width: 350px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     min-height: 400px;
+    border-radius: 0;
 }
 
 .card-body {
@@ -18,6 +25,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    padding: 20px 40px;
 }
 
 .title {
@@ -27,4 +35,58 @@
 
 .btn {
     font-size: 14px;
+    margin: 10px 0 30px 0;
+    width: 100%;
+    background-color: var(--highlight-color);
+    border: none;
 }
+
+.btn:hover, .btn:active, .btn:focus, .btn:target, .btn:visited {
+    background-color: var(--highlight-color-dark);
+}
+
+.flex {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.pad-left-10 {
+    padding-left: 10px;
+}
+
+/* text */
+
+.light-text {
+    color: var(--light-color)
+}   
+
+.bold {
+    font-weight: 700;
+}
+
+.highlight {
+    color: var(--highlight-color);
+}
+
+
+/* price */
+
+.price-wrapper {
+    text-align: center;
+    margin: 0px 0 20px 0;
+    padding: 30px 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.price {
+    font-size: 24px;
+}
+

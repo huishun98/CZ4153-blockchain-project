@@ -62,6 +62,7 @@ contract Auction {
         owner = msg.sender;
         openingRate = _rate;
         totalPotMinTokens = 0;
+        // TODO - add reserve rate
     }
 
     function updateStage() public view returns (Stages) {

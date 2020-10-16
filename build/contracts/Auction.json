@@ -169,23 +169,6 @@
       "constant": true
     },
     {
-<<<<<<< HEAD
-=======
-      "inputs": [],
-      "name": "stage",
-      "outputs": [
-        {
-          "internalType": "enum Auction.Stages",
-          "name": "",
-          "type": "uint8"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
->>>>>>> 662cffa5850ef7b7e752efec74e90632b4fd2ba1
       "inputs": [
         {
           "internalType": "address",
@@ -298,7 +281,6 @@
         "src": "0:23:0"
       },
       {
-<<<<<<< HEAD
         "absolutePath": "/Users/huishun/Desktop/blockchain/contracts/HuiToken.sol",
         "file": "./HuiToken.sol",
         "id": 2,
@@ -306,15 +288,6 @@
         "scope": 185,
         "sourceUnit": 240,
         "src": "25:24:0",
-=======
-        "absolutePath": "/D/repos/CZ4153-blockchain-project/contracts/HuiToken.sol",
-        "file": "./HuiToken.sol",
-        "id": 2,
-        "nodeType": "ImportDirective",
-        "scope": 147,
-        "sourceUnit": 310,
-        "src": "27:24:0",
->>>>>>> 662cffa5850ef7b7e752efec74e90632b4fd2ba1
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -2630,11 +2603,7 @@
                           "typeString": "bool"
                         }
                       ],
-<<<<<<< HEAD
                       "id": 83,
-=======
-                      "id": 31,
->>>>>>> 662cffa5850ef7b7e752efec74e90632b4fd2ba1
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -2642,21 +2611,13 @@
                         -18
                       ],
                       "referencedDeclaration": -18,
-<<<<<<< HEAD
                       "src": "959:7:0",
-=======
-                      "src": "578:7:0",
->>>>>>> 662cffa5850ef7b7e752efec74e90632b4fd2ba1
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
                         "typeString": "function (bool) pure"
                       }
                     },
-<<<<<<< HEAD
                     "id": 90,
-=======
-                    "id": 41,
->>>>>>> 662cffa5850ef7b7e752efec74e90632b4fd2ba1
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
