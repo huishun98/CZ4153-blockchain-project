@@ -18,5 +18,10 @@
   "bugs": {
     "url": "https://github.com/huishun98/CZ4153-blockchain-project/issues"
   },
-  "homepage": "https://github.com/huishun98/CZ4153-blockchain-project#readme"
+  "homepage": "https://github.com/huishun98/CZ4153-blockchain-project#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^3.2.0",
+    "@truffle/hdwallet-provider": "^1.1.0",
+    "truffle": "^5.1.48"
+  }
 }

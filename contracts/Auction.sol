@@ -6,6 +6,7 @@ contract Auction {
     //hello
     HuiToken public huiToken;
     address public owner;
+    address public wallet;
     uint256 public weiRaised;
 
     uint256 public openingRate;
@@ -15,12 +16,43 @@ contract Auction {
 
     uint256 public totalPotMinTokens;
 
-    bool public auctionEnded;
-
     uint256 public openingTime;
     uint256 public closingTime;
 
-    mapping(address => uint256) public totalBidAmt;
+    Stages public stage;
+
+    enum Stages {
+        AuctionStarted,
+        AuctionEnded
+    }
+
+    modifier onlyWhileOpen {
+        require(block.timestamp >= openingTime && block.timestamp <= closingTime);
+        _;
+    }
+
+    modifier atStage(Stages _stage) {
+        if (stage != _stage)
+            // Contract not in expected state
+            revert();
+        _;
+    }
+
+    modifier isOwner() {
+        if (msg.sender != owner)
+            // Only owner is allowed to proceed
+            revert();
+        _;
+    }
+
+    modifier isWallet() {
+        if (msg.sender != wallet)
+            // Only wallet is allowed to proceed
+            revert();
+        _;
+    }
+
+    mapping(address => uint) public totalBidAmt;
     mapping(address => bool) public IsBidding;
 
     event BidStaked(address beneficiary, uint256 amount);
@@ -32,40 +64,44 @@ contract Auction {
         totalPotMinTokens = 0;
     }
 
-    function startAuction() public {
-        require(msg.sender == owner);
-
-        // TODO: start countdown
-
-        auctionEnded = false;
+    function updateStage() public view returns (Stages) {
+        return stage;
     }
 
-    // TODO: function to change price of tokeni
+    function randomFunciont () public onlyWhileOpen {
 
-    function stakeBid(address _beneficiary) public payable {
-        require(_beneficiary != address(0));
-        require(msg.value > 0, "amount cannot be 0 or less");
-
-        weiRaised = weiRaised + msg.value;
-
-        if (IsBidding[_beneficiary] == true) {
-            totalBidAmt[_beneficiary] += msg.value;
-        } else {
-            IsBidding[_beneficiary] = true;
-            totalBidAmt[_beneficiary] = msg.value;
-        }
-
-        emit BidStaked(_beneficiary, totalBidAmt[_beneficiary]);
     }
 
-    // 
-
-    function claimTokens() external {
-        require(auctionEnded == true);
-        require(IsBidding[msg.sender] == true);
-
-        uint256 weiAmount = totalBidAmt[msg.sender];
-        uint256 tokensOwed = weiAmount / closingRate;
-        huiToken.transfer(msg.sender, tokensOwed);
+    function startAuction() external isOwner {
+        openingTime = now;
+        closingTime = openingTime + 20 minutes;
     }
+
+    // function stakeBid(address _beneficiary) public payable {
+    //     require(_beneficiary != address(0));
+    //     require(msg.value > 0, "amount cannot be 0 or less");
+
+    //     weiRaised += msg.value;
+
+    //     if(IsBidding[_beneficiary] == true) {
+    //         totalBidAmt[_beneficiary] += msg.value;
+    //     }
+
+    //     else {
+    //         IsBidding[_beneficiary] = true;
+    //         totalBidAmt[_beneficiary] = msg.value;
+    //     }
+        
+    //     emit BidStaked(_beneficiary, msg.value);
+    // }
+
+    // function claimTokens() external {
+    //     require(auctionEnded == true);
+    //     require(IsBidding[msg.sender] == true);
+
+    //     uint weiAmount = BidStaked[msg.sender];
+    //     uint tokensOwed = weiAmount/closingRate;
+    //     huiToken.transfer(msg.sender, tokensOwed);
+
+    // }
 }
