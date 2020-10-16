@@ -10,7 +10,10 @@ import artifact from "../build/contracts/DutchAuction.json"; // TODO CHANGE
 const web3 = new Web3(
     Web3.currentProvider || new Web3.providers.WebsocketProvider(infuraWSS)
 );
-const contract = new web3.eth.Contract(artifact.abi, auctionAddress);
+// const contract = new web3.eth.Contract(artifact.abi, auctionAddress);
+const contracttemplate = require("@truffle/contract");
+
+const contract = contracttemplate({abi: artifact.abi})
 
 export const getCurrentTokenPrice = async () => {
     // Using MetaMask API to send transaction

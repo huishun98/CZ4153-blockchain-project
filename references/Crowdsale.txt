@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidty ^0.6.2;
 
 import "../token/ERC20/ERC20.sol";
 import "../math/SafeMath.sol";
