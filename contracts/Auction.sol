@@ -10,11 +10,12 @@ contract Auction {
     uint256 public weiRaised;
 
     uint256 public openingRate;
-    uint256 public currentRate;
+    uint256 public currentRate; // may not need current rate due to calcCurrentRate()
     uint256 public reserveRate;
     uint256 public closingRate;
 
     uint256 public totalPotMinTokens;
+    uint256 public tokensLeft;
 
     uint256 public openingTime;
     uint256 public closingTime;
@@ -22,6 +23,7 @@ contract Auction {
     Stages public stage;
 
     enum Stages {
+        AuctionDeployed,
         AuctionStarted,
         AuctionEnded
     }
@@ -62,48 +64,57 @@ contract Auction {
         owner = msg.sender;
         openingRate = _rate;
         totalPotMinTokens = 0;
+        tokensLeft = 1000;
         // TODO - ADD RESERVE RATE
     }
 
-    function updateStage() public view returns (Stages) {
-        return stage;
+    function calcCurrentTokenPrice() public view returns (uint256) {
+        if (stage == Stages.AuctionDeployed) {
+            return openingRate;
+        } 
+        if (stage == Stages.AuctionStarted || stage == Stages.AuctionEnded) {
+            // TODO - MATH TO CALCULATE CURRENT TOKEN PRICE
+            return currentRate;
+        }
     }
-    function updateTimeLeft() public view returns (uint256) {
-        return closingTime - now;
-    }
-    function updateCurrentTokenPrice() public view returns (uint256) {
-        return currentRate;
-    }
-    function updateTokensLeft() public view returns (uint256) {
-        return totalPotMinTokens;
-    }
+
 
     function randomFunciont () public onlyWhileOpen {
 
     }
 
-    function startAuction() external isOwner {
+    function startAuction() public isOwner returns (Stages) { // atStage(Stages.AuctionDeployed)
+        stage = Stages.AuctionStarted;
         openingTime = now;
         closingTime = openingTime + 20 minutes;
+        return stage;
     }
 
-    // function stakeBid(address _beneficiary) public payable {
-    //     require(_beneficiary != address(0));
-    //     require(msg.value > 0, "amount cannot be 0 or less");
+    function terminateAuction() internal {
+        stage = Stages.AuctionEnded;
+    }
 
-    //     weiRaised += msg.value;
+    function stakeBid() public payable atStage(Stages.AuctionStarted) {
+        require(msg.sender != address(0));
+        require(msg.value > 0, "amount cannot be 0 or less");
 
-    //     if(IsBidding[_beneficiary] == true) {
-    //         totalBidAmt[_beneficiary] += msg.value;
-    //     }
+        // TODO - TAKE NOTE OF VALUE STAKED BY BIDDER
 
-    //     else {
-    //         IsBidding[_beneficiary] = true;
-    //         totalBidAmt[_beneficiary] = msg.value;
-    //     }
-        
-    //     emit BidStaked(_beneficiary, msg.value);
-    // }
+        weiRaised += msg.value;
+        totalBidAmt[msg.sender] = msg.value;
+
+        // if(IsBidding[msg.sender] == true) {
+        //     totalBidAmt[msg.sender] += msg.value;
+        // }
+        // else {
+        //     IsBidding[msg.sender] = true;
+        //     totalBidAmt[msg.sender] = msg.value;
+        // }
+
+        // TODO - STORE ETHER IN WALLET IF VALID
+
+        // emit BidStaked(_beneficiary, msg.value);
+    }
 
     // function claimTokens() external {
     //     require(auctionEnded == true);
@@ -114,4 +125,21 @@ contract Auction {
     //     huiToken.transfer(msg.sender, tokensOwed);
 
     // }
+
+    // GETTER FUNCTIONS
+    function updateStage() public view returns (Stages) {
+        return stage;
+    }
+    function updateTimeLeft() public view returns (uint256) {
+        if (stage == Stages.AuctionDeployed) {
+            return 20 minutes;
+        }
+        if (stage == Stages.AuctionStarted) {
+            return closingTime - now;
+        }
+        return 0;
+    }
+    function updateTokensLeft() public view returns (uint256) {
+        return tokensLeft;
+    }
 }

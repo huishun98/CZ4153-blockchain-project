@@ -22,49 +22,48 @@ class App extends React.Component {
 
   async componentDidMount() {
     // FUNCTION TO CHECK STAGE OF AUCTION (STARTED? ENDED?)
-    this._updateStage()
-    // TO-DO - IF STARTED, UPDATE STATE
+    this.updateStates()
 
-    // TO-DO - WATCH FOR EMITS (E.G. ENDING ETC.)
+    // TODO - WATCH FOR EMITS (E.G. ENDING ETC.)
     // let event = contractInstance.event()
     // event.watch(callback)
   }
 
   // FUNCTION TO GET STAGE
   _updateStage = async () => {
-    let stage = await getStage()
-    console.log({stage})
+    const stage = await getStage()
+    console.log({ stage })
     this.setState({ stage })
   }
   // FUNCTION TO GET TIME LEFT
   _updateTimeLeft = async () => {
-    let timeLeft = await getTimeLeft();
-    this.setState({ timeLeft })
+    const timeLeft = await getTimeLeft();
+    console.log({ timeLeft })
+    this.setState({ timeLeft: Math.round(timeLeft / 60) })
   }
   // FUNCTION TO GET TOKENS LEFT
   _updateTokensLeft = async () => {
-    let tokensLeft = await getTokensLeft();
+    const tokensLeft = await getTokensLeft();
+    console.log({ tokensLeft })
     this.setState({ tokensLeft })
   }
   // FUNCTION TO GET CURRENT TOKEN PRICE
   _updateCurrentTokenPrice = async () => {
-    let currentTokenPrice = await getCurrentTokenPrice();
+    const currentTokenPrice = await getCurrentTokenPrice();
+    console.log({ currentTokenPrice })
     this.setState({ currentTokenPrice })
   }
 
-
-
-  // TO-DO - START AUCTION
+  // TODO - START AUCTION
   _startAuction = async () => {
-    let start = await startAuction()
-    // this.setState({ stage })
+    const stage = await startAuction()
+    console.log({annoyed: stage})
+    this.updateStates()
   }
-  // TO-DO - PLACE BID
-  _placeBid = async () => {
-    let placeBidResult = await placeBid()
-    // this.setState({ stage })
+  // TODO - PLACE BID
+  _placeBid = async (amout) => {
+    await placeBid(amout)
   }
-
 
 
   // FRONTEND FUNCTIONS
@@ -73,15 +72,23 @@ class App extends React.Component {
   }
 
   submitBid(e) {
-    const bid = Number(this.state.inputBid)
-    if(bid <= 0) {
+    const bid = this.state.inputBid
+    if (bid <= 0) {
       alert('Bid cannot be zero or less')
       return
     }
     // TODO - FUNCTION TO CALL CONTRACT TO BUY TOKENS
+    this._placeBid(bid)
     this.setState({ inputBid: '' });
   }
 
+  // FUNCTION TO UPDATE ALL STATES
+  updateStates() {
+    this._updateStage()
+    this._updateTimeLeft()
+    this._updateTokensLeft()
+    this._updateCurrentTokenPrice()
+  }
 
   render() {
     return (
@@ -101,12 +108,13 @@ class App extends React.Component {
               <p>{this.state.tokensLeft}</p>
               <p>{this.state.timeLeft} min</p>
             </div>
-            <button className="btn btn-secondary">Start Auction</button>
+            <button className="btn btn-secondary" onClick={this._startAuction.bind(this)}>Start Auction</button>
             <div className="full-width">
               <p>Place bid (in ETH)</p>
               <input className="form-control" type="number" min="1" placeholder="100" value={this.state.inputBid} onChange={this.setBid.bind(this)} ></input>
               <button className="btn btn-secondary" onClick={this.submitBid.bind(this)}>Submit bid</button>
             </div>
+            <button className="btn btn-secondary" onClick={this.updateStates.bind(this)}>Update State</button>
           </div>
         </div>
       </div>
