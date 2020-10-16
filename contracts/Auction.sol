@@ -1,4 +1,4 @@
-pragma solidty ^0.6.2;
+pragma solidity ^0.6.2;
 
 import "./HuiToken.sol";
 
@@ -20,7 +20,7 @@ contract Auction {
     uint256 public openingTime;
     uint256 public closingTime;
 
-    mapping(address => uint) public totalBidAmt;
+    mapping(address => uint256) public totalBidAmt;
     mapping(address => bool) public IsBidding;
 
     event BidStaked(address beneficiary, uint256 amount);
@@ -32,37 +32,40 @@ contract Auction {
         totalPotMinTokens = 0;
     }
 
-    function startAuction() external public {
+    function startAuction() public {
         require(msg.sender == owner);
+
+        // TODO: start countdown
 
         auctionEnded = false;
     }
+
+    // TODO: function to change price of tokeni
 
     function stakeBid(address _beneficiary) public payable {
         require(_beneficiary != address(0));
         require(msg.value > 0, "amount cannot be 0 or less");
 
-        weiRaised = weiRaised.add(msg.value);
+        weiRaised = weiRaised + msg.value;
 
-        if(IsBidding[_beneficiary] == true) {
+        if (IsBidding[_beneficiary] == true) {
             totalBidAmt[_beneficiary] += msg.value;
-        }
-
-        else {
+        } else {
             IsBidding[_beneficiary] = true;
             totalBidAmt[_beneficiary] = msg.value;
         }
-        
-        emit BidStaked(_beneficiary, weiAmount);
+
+        emit BidStaked(_beneficiary, totalBidAmt[_beneficiary]);
     }
+
+    // 
 
     function claimTokens() external {
         require(auctionEnded == true);
         require(IsBidding[msg.sender] == true);
 
-        uint weiAmount = BidStaked[msg.sender];
-        uint tokensOwed = weiAmount/closingRate;
+        uint256 weiAmount = totalBidAmt[msg.sender];
+        uint256 tokensOwed = weiAmount / closingRate;
         huiToken.transfer(msg.sender, tokensOwed);
-
     }
 }
