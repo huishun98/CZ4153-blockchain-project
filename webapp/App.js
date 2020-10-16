@@ -1,5 +1,5 @@
 import React from "react";
-import { getCurrentTokenPrice, getStage, startAuction } from "./auction.js"
+import { getCurrentTokenPrice, getStage, startAuction, getTimeLeft, getTokensLeft, placeBid } from "./auction.js"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -8,41 +8,66 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // initialPrice: 2000,
-      // itemName: "MacBook Pro 15",
-      // reservePrice: 1000,
-      // lastForBlocks: 100,
-      // strategy: localStorage.getItem("linearStrategyAddress") || null,
-      // seller: this.accountService.currentAccount,
+      // TO RETRIEVE FROM CONTRACT
       currentTokenPrice: 0,
       tokensLeft: 1000,
       timeLeft: 20,
-      inputBid: '',
-      // stage: "unset"
-    };
+      stage: null,
 
-    this._getCurrentTokenPrice = this._getCurrentTokenPrice.bind(this);
-    this._startAuction = this._startAuction.bind(this);
-    this._getStage = this._getStage.bind(this);
+      // ONLY ON FRONTEND
+      inputBid: '',
+    };
   }
 
 
-  _getCurrentTokenPrice = async () => {
+  async componentDidMount() {
+    // FUNCTION TO CHECK STAGE OF AUCTION (STARTED? ENDED?)
+    this._updateStage()
+    // TO-DO - IF STARTED, UPDATE STATE
+
+    // TO-DO - WATCH FOR EMITS (E.G. ENDING ETC.)
+    // let event = contractInstance.event()
+    // event.watch(callback)
+  }
+
+  // FUNCTION TO GET STAGE
+  _updateStage = async () => {
+    let stage = await getStage()
+    console.log({stage})
+    this.setState({ stage })
+  }
+  // FUNCTION TO GET TIME LEFT
+  _updateTimeLeft = async () => {
+    let timeLeft = await getTimeLeft();
+    this.setState({ timeLeft })
+  }
+  // FUNCTION TO GET TOKENS LEFT
+  _updateTokensLeft = async () => {
+    let tokensLeft = await getTokensLeft();
+    this.setState({ tokensLeft })
+  }
+  // FUNCTION TO GET CURRENT TOKEN PRICE
+  _updateCurrentTokenPrice = async () => {
     let currentTokenPrice = await getCurrentTokenPrice();
     this.setState({ currentTokenPrice })
   }
 
+
+
+  // TO-DO - START AUCTION
   _startAuction = async () => {
     let start = await startAuction()
     // this.setState({ stage })
   }
-
-  _getStage = async () => {
-    let stage = await getStage()
-    this.setState({ stage })
+  // TO-DO - PLACE BID
+  _placeBid = async () => {
+    let placeBidResult = await placeBid()
+    // this.setState({ stage })
   }
 
-  // frontend functions
+
+
+  // FRONTEND FUNCTIONS
   setBid(e) {
     this.setState({ inputBid: e.target.value });
   }
@@ -53,7 +78,7 @@ class App extends React.Component {
       alert('Bid cannot be zero or less')
       return
     }
-    // TODO - FUNCTION TO CALL CONTRACT
+    // TODO - FUNCTION TO CALL CONTRACT TO BUY TOKENS
     this.setState({ inputBid: '' });
   }
 
@@ -82,11 +107,6 @@ class App extends React.Component {
               <input className="form-control" type="number" min="1" placeholder="100" value={this.state.inputBid} onChange={this.setBid.bind(this)} ></input>
               <button className="btn btn-secondary" onClick={this.submitBid.bind(this)}>Submit bid</button>
             </div>
-            {/* <p>Current token price is: {this.state.currentTokenPrice}</p>
-            <button className="btn btn-primary" onClick={this._getCurrentTokenPrice}>Update current token price</button>
-            <p>Current stage is: {this.state.stage}</p>
-            <button className="btn btn-secondary" onClick={this._getStage}>Update stage</button>
-            <button className="btn btn-secondary" onClick={this._startAuction}>Start auction</button> */}
           </div>
         </div>
       </div>

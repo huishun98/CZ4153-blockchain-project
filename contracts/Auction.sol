@@ -62,11 +62,20 @@ contract Auction {
         owner = msg.sender;
         openingRate = _rate;
         totalPotMinTokens = 0;
-        // TODO - add reserve rate
+        // TODO - ADD RESERVE RATE
     }
 
     function updateStage() public view returns (Stages) {
         return stage;
+    }
+    function updateTimeLeft() public view returns (uint256) {
+        return closingTime - now;
+    }
+    function updateCurrentTokenPrice() public view returns (uint256) {
+        return currentRate;
+    }
+    function updateTokensLeft() public view returns (uint256) {
+        return totalPotMinTokens;
     }
 
     function randomFunciont () public onlyWhileOpen {
