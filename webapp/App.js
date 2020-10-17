@@ -11,11 +11,12 @@ class App extends React.Component {
       // TO RETRIEVE FROM CONTRACT
       currentTokenPrice: 0,
       tokensLeft: 1000,
-      timeLeft: 20,
+      timeLeft: "20:00",
       stage: null,
 
       // ONLY ON FRONTEND
       inputBid: '',
+      countingDown: false,
     };
   }
 
@@ -34,12 +35,20 @@ class App extends React.Component {
     const stage = await getStage()
     console.log({ stage })
     this.setState({ stage })
+
+    // if auction has started and counting down has not started, start countdown
+    if (stage == "1" && !this.countingDown) {
+      this.countingDown = true
+      const timeLeft = await this._updateTimeLeft()
+      this.startCountdown(timeLeft)
+    }
   }
   // FUNCTION TO GET TIME LEFT
   _updateTimeLeft = async () => {
     const timeLeft = await getTimeLeft();
     console.log({ timeLeft })
-    this.setState({ timeLeft: Math.round(timeLeft / 60) })
+    this.setTimeState(timeLeft)
+    return timeLeft
   }
   // FUNCTION TO GET TOKENS LEFT
   _updateTokensLeft = async () => {
@@ -56,8 +65,7 @@ class App extends React.Component {
 
   // TODO - START AUCTION
   _startAuction = async () => {
-    const stage = await startAuction()
-    console.log({annoyed: stage})
+    await startAuction()
     this.updateStates()
   }
   // TODO - PLACE BID
@@ -71,13 +79,34 @@ class App extends React.Component {
     this.setState({ inputBid: e.target.value });
   }
 
+  startCountdown(duration) {
+    let timer = duration, minutes, seconds;
+    const _this = this
+    const intervalId = setInterval(function () {
+        _this.setTimeState(timer)
+
+        if (--timer < 0) {
+            _this.setState({ countingDown: false });
+            clearInterval(intervalId);
+            alert('Auction has ended.')
+        }
+    }, 1000);
+  }
+
+  setTimeState(timer) {
+    let minutes = parseInt(timer / 60, 10);
+    let seconds = parseInt(timer % 60, 10);
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+    this.setState({ timeLeft: `${minutes}:${seconds}` })
+  }
+
   submitBid(e) {
     const bid = this.state.inputBid
     if (bid <= 0) {
       alert('Bid cannot be zero or less')
       return
     }
-    // TODO - FUNCTION TO CALL CONTRACT TO BUY TOKENS
     this._placeBid(bid)
     this.setState({ inputBid: '' });
   }
@@ -108,7 +137,7 @@ class App extends React.Component {
               <p>{this.state.tokensLeft}</p>
               <p>{this.state.timeLeft} min</p>
             </div>
-            <button className="btn btn-secondary" onClick={this._startAuction.bind(this)}>Start Auction</button>
+            <button className={`btn btn-secondary ${this.state.stage == "1" ? "disabled" : ""}`} onClick={this._startAuction.bind(this)}>Start Auction</button>
             <div className="full-width">
               <p>Place bid (in ETH)</p>
               <input className="form-control" type="number" min="1" placeholder="100" value={this.state.inputBid} onChange={this.setBid.bind(this)} ></input>

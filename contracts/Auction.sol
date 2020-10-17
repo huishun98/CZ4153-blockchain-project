@@ -88,6 +88,8 @@ contract Auction {
         openingTime = now;
         closingTime = openingTime + 20 minutes;
         return stage;
+
+        // TODO - ADD ETHEREUM ALARM CLOCK TO END FUNCTION WHEN 20 MINUTES IS UP.
     }
 
     function terminateAuction() internal {
@@ -127,19 +129,13 @@ contract Auction {
     // }
 
     // GETTER FUNCTIONS
-    function updateStage() public view returns (Stages) {
-        return stage;
-    }
     function updateTimeLeft() public view returns (uint256) {
         if (stage == Stages.AuctionDeployed) {
             return 20 minutes;
         }
         if (stage == Stages.AuctionStarted) {
-            return closingTime - now;
+            return closingTime - now; // TODO - BUG - SEEMS TO BE RETURNING 20 MINUTES?
         }
         return 0;
-    }
-    function updateTokensLeft() public view returns (uint256) {
-        return tokensLeft;
     }
 }

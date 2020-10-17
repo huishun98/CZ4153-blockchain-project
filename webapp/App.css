@@ -59,6 +59,10 @@
     padding-left: 10px;
 }
 
+.disabled {
+    pointer-events: none;
+}
+
 /* text */
 
 .light-text {

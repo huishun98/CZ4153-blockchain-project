@@ -4,12 +4,12 @@ import Web3 from "web3";
 // import Web3 from "web3";
 import { infuraWSS } from './config'
 import {
-    auctionAddress, localAuctionAddress
+    auctionAddress, localAuctionAddress, localAccountAddress
 } from "./config.js"
 import artifact from "../build/contracts/Auction.json";
 
 const web3 = new Web3(
-    new Web3.providers.HttpProvider("http://localhost:7545") 
+    new Web3.providers.HttpProvider("http://localhost:7545")
     // || Web3.currentProvider || new Web3.providers.WebsocketProvider(infuraWSS)
 );
 
@@ -22,7 +22,7 @@ export const startAuction = async () => {
     // Using MetaMask API to send transaction
     const provider = await detectEthereumProvider();
     if (provider) {
-        return contract.methods.startAuction().call()
+        return contract.methods.startAuction().send({ from: localAccountAddress })
     } else {
         console.log("Please install MetaMask!");
     }
@@ -46,7 +46,7 @@ export const placeBid = async (amount) => {
                             inputs: [],
                         },
                         []
-                    ), 
+                    ),
                     chainId: 3,
                 },
             ],
@@ -60,7 +60,8 @@ export const placeBid = async (amount) => {
 export const getStage = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
-        return contract.methods.updateStage().call()
+        console.log({ mtds:contract.methods })
+        return contract.methods.stage().call()
     } else {
         console.log("Please install MetaMask!");
     }
@@ -76,7 +77,7 @@ export const getTimeLeft = async () => {
 export const getTokensLeft = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
-        return contract.methods.updateTokensLeft().call()
+        return contract.methods.tokensLeft().call()
     } else {
         console.log("Please install MetaMask!");
     }
