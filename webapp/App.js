@@ -2,6 +2,7 @@ import React from "react";
 import { getCurrentTokenPrice, getStage, startAuction, getClosingTime, getWeiRaised, placeBid } from "./auction.js"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import { timers } from "jquery";
 
 // example from doc: https://reactjs.org/docs/forms.html#controlled-components
 class App extends React.Component {
@@ -54,7 +55,11 @@ class App extends React.Component {
   _updateTimeLeft = async () => {
     const closingTime = await getClosingTime();
     const now = new Date();
-    const timeLeft = (closingTime.getTime() - now.getTime()) / 1000;
+    let timeLeft = (closingTime.getTime() - now.getTime()) / 1000;
+    if (timeLeft < 0) {
+      this.countingDown = false
+      timeLeft = 0
+    }
     console.log({ timeLeft })
     this.setTimeState(timeLeft)
     return timeLeft
@@ -92,7 +97,9 @@ class App extends React.Component {
   startCountdown(duration) {
     let timer = duration;
     const _this = this
-    this.setTimeState(--timer)
+    if (timer > 0) {
+      this.setTimeState(--timer)
+    }
     const intervalId = setInterval(function () {
       _this.setTimeState(timer)
 
@@ -127,9 +134,10 @@ class App extends React.Component {
     setTimeout(function () {
       if (_this.countingDown) {
         _this._updateTokensLeft()
+        _this._updateTimeLeft()
         _this.regularUpdate()
       }
-    }, 10000)
+    }, 5000)
   }
 
   // FUNCTION TO UPDATE ALL STATES
