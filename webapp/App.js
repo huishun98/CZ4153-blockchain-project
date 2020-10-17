@@ -41,9 +41,9 @@ class App extends React.Component {
       this.countingDown = true
       const timeLeft = await this._updateTimeLeft()
       this.startCountdown(timeLeft)
-      this.updateEveryMinute()
+      this.regularUpdate()
     } else if (stage == "1") {
-      this.updateEveryMinute()
+      this.regularUpdate()
     } else if (stage == "2") {
       this.setTimeState(0)
     } else {
@@ -122,14 +122,14 @@ class App extends React.Component {
     this.setState({ inputBid: '' });
   }
 
-  updateEveryMinute() {
+  regularUpdate() {
     const _this = this
     setTimeout(function () {
       if (_this.countingDown) {
-        _this.updateStates()
-        _this.updateEveryMinute()
+        _this._updateTokensLeft()
+        _this.regularUpdate()
       }
-    }, 60000)
+    }, 10000)
   }
 
   // FUNCTION TO UPDATE ALL STATES
