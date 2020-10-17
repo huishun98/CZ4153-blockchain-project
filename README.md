@@ -22,4 +22,5 @@ For project instructions, see [ProjectA_DevProject.docx](ProjectA_DevProject.doc
 2. In project root, run `truffle migrate`.
 3. Get contract address of 'Auction' contract and update config.js in webapp/config.js.
 4. To start dApp, enter `webapp` directory and run `npm start`.
+5. Log into Metamask to conduct transactions
 
