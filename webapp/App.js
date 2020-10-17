@@ -40,8 +40,6 @@ class App extends React.Component {
     // if auction has started and counting down has not started, start countdown
     if (stage == "1" && !this.countingDown) {
       this.countingDown = true
-      const timeLeft = await this._updateTimeLeft()
-      this.startCountdown(timeLeft)
       this.regularUpdate()
     } else if (stage == "1") {
       this.regularUpdate()
@@ -88,27 +86,9 @@ class App extends React.Component {
     await placeBid(amout)
   }
 
-
   // FRONTEND FUNCTIONS
   setBid(e) {
     this.setState({ inputBid: e.target.value });
-  }
-
-  startCountdown(duration) {
-    let timer = duration;
-    const _this = this
-    if (timer > 0) {
-      this.setTimeState(--timer)
-    }
-    const intervalId = setInterval(function () {
-      _this.setTimeState(timer)
-
-      if (--timer < 0) {
-        _this.setState({ countingDown: false });
-        clearInterval(intervalId);
-        alert('Auction has ended.')
-      }
-    }, 1000);
   }
 
   setTimeState(timer) {
@@ -129,7 +109,7 @@ class App extends React.Component {
     this.setState({ inputBid: '' });
   }
 
-  regularUpdate() {
+  regularUpdate = () => {
     const _this = this
     setTimeout(function () {
       if (_this.countingDown) {
@@ -137,7 +117,7 @@ class App extends React.Component {
         _this._updateTimeLeft()
         _this.regularUpdate()
       }
-    }, 5000)
+    }, 1000)
   }
 
   // FUNCTION TO UPDATE ALL STATES
