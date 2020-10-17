@@ -75,10 +75,10 @@ export const getClosingTime = async () => {
         console.log("Please install MetaMask!");
     }
 };
-export const getTokensLeft = async () => {
+export const getWeiRaised = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
-        return contract.methods.tokensLeft().call()
+        return contract.methods.weiRaised().call()
     } else {
         console.log("Please install MetaMask!");
     }

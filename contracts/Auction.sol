@@ -10,12 +10,11 @@ contract Auction {
     uint256 public weiRaised;
 
     uint256 public openingRate;
-    uint256 public currentRate; // may not need current rate due to calcCurrentRate()
+    // uint256 public currentRate; // may not need current rate due to calcCurrentTokenPrice()
     uint256 public reserveRate;
     uint256 public closingRate;
 
     uint256 public totalPotMinTokens;
-    uint256 public tokensLeft;
 
     uint256 public openingTime;
     uint256 public closingTime;
@@ -64,16 +63,16 @@ contract Auction {
         owner = msg.sender;
         openingRate = _rate;
         totalPotMinTokens = 0;
-        tokensLeft = 1000;
         // TODO - ADD RESERVE RATE
     }
 
-    function calcCurrentTokenPrice() public view returns (uint256) {
+    function calcCurrentTokenPrice() public returns (uint256) {
         if (stage == Stages.AuctionDeployed) {
             return openingRate;
         } 
         if (stage == Stages.AuctionStarted || stage == Stages.AuctionEnded) {
             // TODO - MATH TO CALCULATE CURRENT TOKEN PRICE
+            uint256 currentRate = openingRate;
             return currentRate;
         }
     }

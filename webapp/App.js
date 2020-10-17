@@ -1,5 +1,5 @@
 import React from "react";
-import { getCurrentTokenPrice, getStage, startAuction, getClosingTime, getTokensLeft, placeBid } from "./auction.js"
+import { getCurrentTokenPrice, getStage, startAuction, getClosingTime, getWeiRaised, placeBid } from "./auction.js"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -41,6 +41,9 @@ class App extends React.Component {
       this.countingDown = true
       const timeLeft = await this._updateTimeLeft()
       this.startCountdown(timeLeft)
+      this.updateEveryMinute()
+    } else if (stage == "1") {
+      this.updateEveryMinute()
     } else if (stage == "2") {
       this.setTimeState(0)
     } else {
@@ -51,22 +54,23 @@ class App extends React.Component {
   _updateTimeLeft = async () => {
     const closingTime = await getClosingTime();
     const now = new Date();
-    const timeLeft = (closingTime.getTime() - now.getTime())/1000;
+    const timeLeft = (closingTime.getTime() - now.getTime()) / 1000;
     console.log({ timeLeft })
     this.setTimeState(timeLeft)
     return timeLeft
   }
   // FUNCTION TO GET TOKENS LEFT
   _updateTokensLeft = async () => {
-    const tokensLeft = await getTokensLeft();
-    console.log({ tokensLeft })
-    this.setState({ tokensLeft })
+    const weiRaised = await getWeiRaised();
+    const currentTokenPrice = await this._updateCurrentTokenPrice();
+    this.setState({ tokensLeft: (1000 - weiRaised / 10 ** 18 / currentTokenPrice).toFixed(5) })
   }
   // FUNCTION TO GET CURRENT TOKEN PRICE
   _updateCurrentTokenPrice = async () => {
     const currentTokenPrice = await getCurrentTokenPrice();
     console.log({ currentTokenPrice })
     this.setState({ currentTokenPrice })
+    return currentTokenPrice
   }
 
   // TODO - START AUCTION
@@ -118,11 +122,20 @@ class App extends React.Component {
     this.setState({ inputBid: '' });
   }
 
+  updateEveryMinute() {
+    const _this = this
+    setTimeout(function () {
+      if (_this.countingDown) {
+        _this.updateStates()
+        _this.updateEveryMinute()
+      }
+    }, 60000)
+  }
+
   // FUNCTION TO UPDATE ALL STATES
   updateStates() {
     this._updateStage()
     this._updateTokensLeft()
-    this._updateCurrentTokenPrice()
   }
 
   render() {
