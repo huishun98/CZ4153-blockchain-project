@@ -127,15 +127,4 @@ contract Auction {
     //     huiToken.transfer(msg.sender, tokensOwed);
 
     // }
-
-    // GETTER FUNCTIONS
-    function updateTimeLeft() public view returns (uint256) {
-        if (stage == Stages.AuctionDeployed) {
-            return 20 minutes;
-        }
-        if (stage == Stages.AuctionStarted) {
-            return closingTime - now; // TODO - BUG - SEEMS TO BE RETURNING 20 MINUTES?
-        }
-        return 0;
-    }
 }

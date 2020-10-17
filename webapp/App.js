@@ -1,5 +1,5 @@
 import React from "react";
-import { getCurrentTokenPrice, getStage, startAuction, getTimeLeft, getTokensLeft, placeBid } from "./auction.js"
+import { getCurrentTokenPrice, getStage, startAuction, getClosingTime, getTokensLeft, placeBid } from "./auction.js"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -11,7 +11,7 @@ class App extends React.Component {
       // TO RETRIEVE FROM CONTRACT
       currentTokenPrice: 0,
       tokensLeft: 1000,
-      timeLeft: "20:00",
+      timeLeft: "",
       stage: null,
 
       // ONLY ON FRONTEND
@@ -41,11 +41,17 @@ class App extends React.Component {
       this.countingDown = true
       const timeLeft = await this._updateTimeLeft()
       this.startCountdown(timeLeft)
+    } else if (stage == "2") {
+      this.setTimeState(0)
+    } else {
+      this.setTimeState(1200)
     }
   }
   // FUNCTION TO GET TIME LEFT
   _updateTimeLeft = async () => {
-    const timeLeft = await getTimeLeft();
+    const closingTime = await getClosingTime();
+    const now = new Date();
+    const timeLeft = (closingTime.getTime() - now.getTime())/1000;
     console.log({ timeLeft })
     this.setTimeState(timeLeft)
     return timeLeft
@@ -80,16 +86,17 @@ class App extends React.Component {
   }
 
   startCountdown(duration) {
-    let timer = duration, minutes, seconds;
+    let timer = duration;
     const _this = this
+    this.setTimeState(--timer)
     const intervalId = setInterval(function () {
-        _this.setTimeState(timer)
+      _this.setTimeState(timer)
 
-        if (--timer < 0) {
-            _this.setState({ countingDown: false });
-            clearInterval(intervalId);
-            alert('Auction has ended.')
-        }
+      if (--timer < 0) {
+        _this.setState({ countingDown: false });
+        clearInterval(intervalId);
+        alert('Auction has ended.')
+      }
     }, 1000);
   }
 
@@ -114,7 +121,6 @@ class App extends React.Component {
   // FUNCTION TO UPDATE ALL STATES
   updateStates() {
     this._updateStage()
-    this._updateTimeLeft()
     this._updateTokensLeft()
     this._updateCurrentTokenPrice()
   }
