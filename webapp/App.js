@@ -2,7 +2,6 @@ import React from "react";
 import { getCurrentTokenPrice, getStage, startAuction, getClosingTime, getWeiRaised, placeBid } from "./auction.js"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import { timers } from "jquery";
 
 // example from doc: https://reactjs.org/docs/forms.html#controlled-components
 class App extends React.Component {
@@ -38,8 +37,8 @@ class App extends React.Component {
     this.setState({ stage })
 
     // if auction has started and counting down has not started, start countdown
-    if (stage == "1" && !this.countingDown) {
-      this.countingDown = true
+    if (stage == "1" && !this.state.countingDown) {
+      this.setState({ countingDown: true })
       this.regularUpdate()
     } else if (stage == "1") {
       this.regularUpdate()
@@ -55,7 +54,8 @@ class App extends React.Component {
     const now = new Date();
     let timeLeft = (closingTime.getTime() - now.getTime()) / 1000;
     if (timeLeft < 0) {
-      this.countingDown = false
+      this.setState({ countingDown: false })
+      alert('Auction has ended.')
       timeLeft = 0
     }
     console.log({ timeLeft })
@@ -112,7 +112,7 @@ class App extends React.Component {
   regularUpdate = () => {
     const _this = this
     setTimeout(function () {
-      if (_this.countingDown) {
+      if (_this.state.countingDown) {
         _this._updateTokensLeft()
         _this._updateTimeLeft()
         _this.regularUpdate()
