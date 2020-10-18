@@ -36,7 +36,6 @@ export const collectTokens = async () => {
     }
 }
 
-// TODO - CREATE PLACEBID FUNCTION IN CONTRACT AND CALL
 export const placeBid = async (amount) => {
     const provider = await detectEthereumProvider();
     if (provider) {
@@ -46,7 +45,7 @@ export const placeBid = async (amount) => {
                 {
                     from: ethereum.selectedAddress,
                     to: localAuctionAddress,
-                    value: web3.utils.toWei(amount.toString()),
+                    value: web3.utils.toWei(amount),
                     data: web3.eth.abi.encodeFunctionCall(
                         {
                             name: "stakeBid",
@@ -65,10 +64,17 @@ export const placeBid = async (amount) => {
 };
 
 // GETTING DATA
+export const getUsersBid = async () => {
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        return contract.methods.getBid().call()
+    } else {
+        console.log("Please install MetaMask!");
+    }
+};
 export const getStage = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
-        console.log({ mtds: contract.methods })
         return contract.methods.stage().call()
     } else {
         console.log("Please install MetaMask!");

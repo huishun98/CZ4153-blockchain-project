@@ -1,5 +1,5 @@
 import React from "react";
-import { getCurrentTokenPrice, getStage, startAuction, getClosingTime, getWeiRaised, placeBid, collectTokens } from "./auction.js"
+import { getCurrentTokenPrice, getStage, startAuction, getClosingTime, getWeiRaised, placeBid, collectTokens, getUsersBid } from "./auction.js"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -13,10 +13,12 @@ class App extends React.Component {
       tokensLeft: 1000,
       timeLeft: "",
       stage: null,
+      usersBid: 0,
 
       // ONLY ON FRONTEND
       inputBid: '',
       countingDown: false,
+      tab: 0,
     };
   }
 
@@ -75,16 +77,25 @@ class App extends React.Component {
     this.setState({ currentTokenPrice })
     return currentTokenPrice
   }
+  // FUNCTION TO GET USER'S BID
+  _updateUsersBid = async () => {
+    const usersBidInWei = await getUsersBid();
+    const usersBid = (usersBidInWei/ 10 ** 18).toFixed(5)
+    console.log({ usersBid })
+    this.setState({ usersBid })
+    return usersBid
+  }
 
   // TODO - START AUCTION
   _startAuction = async () => {
     await startAuction()
     this.updateStates()
   }
-  // TODO - PLACE BID
-  _placeBid = async (amout) => {
-    await placeBid(amout)
+
+  _placeBid = async (amt) => {
+    await placeBid(amt.toString())
   }
+
   _collectTokens = async () => {
     await collectTokens()
   }
@@ -92,6 +103,10 @@ class App extends React.Component {
   // FRONTEND FUNCTIONS
   setBid(e) {
     this.setState({ inputBid: e.target.value });
+  }
+
+  toggleTab(tab) {
+    this.setState({ tab });
   }
 
   setTimeState(timer) {
@@ -118,6 +133,7 @@ class App extends React.Component {
       if (_this.state.countingDown) {
         _this._updateTokensLeft()
         _this._updateTimeLeft()
+        _this._updateUsersBid()
         _this.regularUpdate()
       }
     }, 1000)
@@ -127,6 +143,7 @@ class App extends React.Component {
   updateStates() {
     this._updateStage()
     this._updateTokensLeft()
+    this._updateUsersBid()
   }
 
   render() {
@@ -135,29 +152,40 @@ class App extends React.Component {
         <div className="card">
           <div className="card-body">
             <h1 className="title">Dutch auction</h1>
-            <div className="price-wrapper">
-              <span className="price bold">{this.state.currentTokenPrice} ETH</span>
-              <span>Current price</span>
+            <div className="section-wrapper">
+              <div className="price-wrapper">
+                <span className="price bold">{this.state.currentTokenPrice} ETH</span>
+                <span>Current price</span>
+              </div>
+              <div className="flex light-text">
+                <span>Tokens left</span>
+                <span>Time left</span>
+              </div>
+              <div className="flex bold highlight">
+                <p>{this.state.tokensLeft}</p>
+                <p>{this.state.timeLeft} min</p>
+              </div>
+              <button className={`btn btn-secondary`} onClick={this._startAuction.bind(this)}>Start Auction</button>
+              {/* ${this.state.stage !== "0" ? "disabled" : ""} */}
             </div>
-            <div className="flex light-text">
-              <span>Tokens left</span>
-              <span>Time left</span>
+            <div className="flex">
+              <button className={`btn btn-half ${this.state.tab == 0 ? "active" : ""}`} onClick={this.toggleTab.bind(this, 0)}>Place Bid</button>
+              <button className={`btn btn-half ${this.state.tab == 1 ? "active" : ""}`} onClick={this.toggleTab.bind(this, 1)}>My Bid</button>
             </div>
-            <div className="flex bold highlight">
-              <p>{this.state.tokensLeft}</p>
-              <p>{this.state.timeLeft} min</p>
-            </div>
-            <button className={`btn btn-secondary`} onClick={this._startAuction.bind(this)}>Start Auction</button>
-            {/* ${this.state.stage !== "0" ? "disabled" : ""} */}
-            <div className="full-width">
+
+            <div className={`section-wrapper ${this.state.tab == 0 ? "" : "hide"}`}>
               <p>Place bid (in ETH)</p>
               <input className="form-control" type="number" min="1" placeholder="100" value={this.state.inputBid} onChange={this.setBid.bind(this)} ></input>
               <button className={`btn btn-secondary`} onClick={this.submitBid.bind(this)}>Submit bid</button>
               {/* ${this.state.stage !== "1" ? "disabled" : ""} */}
             </div>
-            <button className={`btn btn-secondary`} onClick={this._collectTokens.bind(this)}>Claim tokens</button> 
+            <div className={`section-wrapper ${this.state.tab == 1 ? "" : "hide"}`}>
+              <p>Total bids: <span className="highlight bold">{this.state.usersBid} ETH</span></p>
+              <p>Total potential minimum token: <span className="highlight bold">{(this.state.usersBid / this.state.currentTokenPrice).toFixed(5)} tokens</span></p>
+              <button className={`btn btn-secondary`} onClick={this._collectTokens.bind(this)}>Claim tokens</button>
+            </div>
             {/* ${this.state.stage !== "2" ? "disabled" : ""} */}
-            <a href="#" className="" onClick={this.updateStates.bind(this)}>Update State</a>
+            <a href="#" className="" onClick={this.updateStates.bind(this)}>Update State (only for debugging purposes)</a>
           </div>
         </div>
       </div>

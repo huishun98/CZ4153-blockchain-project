@@ -14,7 +14,7 @@ contract Auction {
     uint256 public reserveRate;
     // uint256 public closingRate; // may not need current rate due to calcCurrentTokenPrice()
 
-    uint256 public totalPotMinTokens;
+    uint256 public totalPotMinTokens; // may not need, can be computed. (currently calculation is in frontend)
 
     uint256 public openingTime;
     uint256 public closingTime;
@@ -102,7 +102,7 @@ contract Auction {
         // TODO - TAKE NOTE OF VALUE STAKED BY BIDDER
 
         weiRaised += msg.value;
-        totalBidAmt[msg.sender] = msg.value;
+        totalBidAmt[msg.sender] += msg.value; // TODO - CHECK IF VALUE ADDED IS CORRECT
 
         // TODO - CHECK THAT NUMBER OF TOKENS LEFT IS ENOUGH
         // TODO - STORE ETHER IN WALLET IF VALID
@@ -116,6 +116,11 @@ contract Auction {
         // }
 
         // emit BidStaked(_beneficiary, msg.value);
+    }
+
+    // GETTERS
+    function getBid() public view returns (uint256) {
+        return totalBidAmt[msg.sender];
     }
 
     // TODO - ALLOW USER TO CLAIM TOKENS

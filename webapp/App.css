@@ -2,6 +2,11 @@
     --light-color: rgb(107, 107, 107);
     --highlight-color: #ec5c3b;
     --highlight-color-dark: #ac3d25;
+    --highlight-two: #65809b;
+    --highlight-two-dark: #2E3A46;
+    --bg-color-one: rgb(247, 247, 247);
+    --bg-color-two: white;
+    --default-box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
 .body {
@@ -11,38 +16,6 @@
     height: 100vh;
     padding: 50px 100px;
     font-size: 14px;
-}
-
-.card {
-    max-width: 350px;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    min-height: 400px;
-    border-radius: 0;
-}
-
-.card-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 20px 40px;
-}
-
-.title {
-    font-size: 14px;
-    margin: 20px 10px;
-}
-
-.btn {
-    font-size: 14px;
-    margin: 10px 0 30px 0;
-    width: 100%;
-    background-color: var(--highlight-color);
-    border: none;
-}
-
-.btn:hover, .btn:active, .btn:focus, .btn:target, .btn:visited {
-    background-color: var(--highlight-color-dark);
 }
 
 .flex {
@@ -63,7 +36,77 @@
     pointer-events: none;
 }
 
+.hide {
+    display: none;
+}
+
+/* button */
+
+.btn {
+    font-size: 14px;
+    margin: 10px 0 10px 0;
+    width: 100%;
+    background-color: var(--highlight-color);
+    border: none;
+}
+
+.btn:hover, .btn:active, .btn:focus, .btn:target, .btn:visited {
+    background-color: var(--highlight-color-dark);
+    box-shadow: var(--default-box-shadow);
+}
+
+.btn-half {
+    width: 48%;
+    background-color: var(--bg-color-two);
+    color: var(--highlight-two);
+    /* font-weight: 700; */
+}
+
+.btn-half:hover, .btn-half:active, .btn-half:focus, .btn-half:target, .btn-half:visited {
+    background-color: var(--bg-color-two);
+    color: var(--highlight-two);
+}
+
+.btn-half.active {
+    pointer-events: none;
+    background-color: var(--highlight-two);
+    color: white;
+    box-shadow: var(--default-box-shadow);
+}
+
+
+/* card */
+
+.card {
+    max-width: 350px;
+    box-shadow: var(--default-box-shadow);
+    min-height: 400px;
+    border-radius: 0;
+    background-color: var(--bg-color-one);
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 30px 10px;
+}
+
+.section-wrapper {
+    padding: 10px 20px;
+    width: 100%;
+    margin: 10px;
+    background-color: var(--bg-color-two);
+}
+
+
 /* text */
+
+.title {
+    font-size: 14px;
+}
+
 
 .light-text {
     color: var(--light-color)
