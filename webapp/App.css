@@ -1,7 +1,8 @@
 :root {
     --light-color: rgb(107, 107, 107);
-    --highlight-color: #EC7054;
-    --highlight-color-dark: #ec5c3b;
+    --highlight-one: #EC7054;
+    --highlight-two: #384855;
+    --highlight-two-dark:#2B343D;
 }
 
 .body {
@@ -37,12 +38,12 @@
     font-size: 14px;
     margin: 10px 0 30px 0;
     width: 100%;
-    background-color: var(--highlight-color);
+    background-color: var(--highlight-two);
     border: none;
 }
 
 .btn:hover, .btn:active, .btn:focus, .btn:target, .btn:visited {
-    background-color: var(--highlight-color-dark);
+    background-color: var(--highlight-two-dark);
 }
 
 .flex {
@@ -74,7 +75,7 @@
 }
 
 .highlight {
-    color: var(--highlight-color);
+    color: var(--highlight-one);
 }
 
 

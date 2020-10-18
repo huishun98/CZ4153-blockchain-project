@@ -1,5 +1,5 @@
 import React from "react";
-import { getCurrentTokenPrice, getStage, startAuction, getClosingTime, getWeiRaised, placeBid } from "./auction.js"
+import { getCurrentTokenPrice, getStage, startAuction, getClosingTime, getWeiRaised, placeBid, collectTokens } from "./auction.js"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -85,6 +85,9 @@ class App extends React.Component {
   _placeBid = async (amout) => {
     await placeBid(amout)
   }
+  _collectTokens = async () => {
+    await collectTokens()
+  }
 
   // FRONTEND FUNCTIONS
   setBid(e) {
@@ -144,13 +147,17 @@ class App extends React.Component {
               <p>{this.state.tokensLeft}</p>
               <p>{this.state.timeLeft} min</p>
             </div>
-            <button className={`btn btn-secondary ${this.state.stage == "1" ? "disabled" : ""}`} onClick={this._startAuction.bind(this)}>Start Auction</button>
+            <button className={`btn btn-secondary`} onClick={this._startAuction.bind(this)}>Start Auction</button>
+            {/* ${this.state.stage !== "0" ? "disabled" : ""} */}
             <div className="full-width">
               <p>Place bid (in ETH)</p>
               <input className="form-control" type="number" min="1" placeholder="100" value={this.state.inputBid} onChange={this.setBid.bind(this)} ></input>
-              <button className="btn btn-secondary" onClick={this.submitBid.bind(this)}>Submit bid</button>
+              <button className={`btn btn-secondary`} onClick={this.submitBid.bind(this)}>Submit bid</button>
+              {/* ${this.state.stage !== "1" ? "disabled" : ""} */}
             </div>
-            <button className="btn btn-secondary" onClick={this.updateStates.bind(this)}>Update State</button>
+            <button className={`btn btn-secondary`} onClick={this._collectTokens.bind(this)}>Claim tokens</button> 
+            {/* ${this.state.stage !== "2" ? "disabled" : ""} */}
+            <a href="#" className="" onClick={this.updateStates.bind(this)}>Update State</a>
           </div>
         </div>
       </div>

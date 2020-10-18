@@ -12,7 +12,7 @@ contract Auction {
     uint256 public openingRate;
     // uint256 public currentRate; // may not need current rate due to calcCurrentTokenPrice()
     uint256 public reserveRate;
-    uint256 public closingRate;
+    // uint256 public closingRate; // may not need current rate due to calcCurrentTokenPrice()
 
     uint256 public totalPotMinTokens;
 
@@ -82,7 +82,7 @@ contract Auction {
 
     }
 
-    function startAuction() public isOwner returns (Stages) { // atStage(Stages.AuctionDeployed)
+    function startAuction() public isOwner atStage(Stages.AuctionDeployed) returns (Stages) { // 
         stage = Stages.AuctionStarted;
         openingTime = now;
         closingTime = openingTime + 20 minutes;
@@ -104,6 +104,9 @@ contract Auction {
         weiRaised += msg.value;
         totalBidAmt[msg.sender] = msg.value;
 
+        // TODO - CHECK THAT NUMBER OF TOKENS LEFT IS ENOUGH
+        // TODO - STORE ETHER IN WALLET IF VALID
+
         // if(IsBidding[msg.sender] == true) {
         //     totalBidAmt[msg.sender] += msg.value;
         // }
@@ -112,18 +115,15 @@ contract Auction {
         //     totalBidAmt[msg.sender] = msg.value;
         // }
 
-        // TODO - STORE ETHER IN WALLET IF VALID
-
         // emit BidStaked(_beneficiary, msg.value);
     }
 
-    // function claimTokens() external {
-    //     require(auctionEnded == true);
-    //     require(IsBidding[msg.sender] == true);
-
-    //     uint weiAmount = BidStaked[msg.sender];
-    //     uint tokensOwed = weiAmount/closingRate;
-    //     huiToken.transfer(msg.sender, tokensOwed);
-
-    // }
+    // TODO - ALLOW USER TO CLAIM TOKENS
+    function claimTokens() public { // atStage(Stages.AuctionEnded)
+        uint bidAmt = totalBidAmt[msg.sender]; 
+        require (bidAmt > 0, "No more tokens for you!"); // user has either collected or has not bid.
+        totalBidAmt[msg.sender] = 0;
+        uint tokensOwed = bidAmt/calcCurrentTokenPrice(); 
+        huiToken.transfer(msg.sender, tokensOwed); // TODO - BUG - VM Exception while processing transaction: revert ERC20: transfer amount exceeds balance
+    }
 }

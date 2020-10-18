@@ -27,6 +27,14 @@ export const startAuction = async () => {
         console.log("Please install MetaMask!");
     }
 };
+export const collectTokens = async () => {
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        return contract.methods.claimTokens().send({ from: localAccountAddress })
+    } else {
+        console.log("Please install MetaMask!");
+    }
+}
 
 // TODO - CREATE PLACEBID FUNCTION IN CONTRACT AND CALL
 export const placeBid = async (amount) => {
@@ -60,7 +68,7 @@ export const placeBid = async (amount) => {
 export const getStage = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
-        console.log({ mtds:contract.methods })
+        console.log({ mtds: contract.methods })
         return contract.methods.stage().call()
     } else {
         console.log("Please install MetaMask!");
