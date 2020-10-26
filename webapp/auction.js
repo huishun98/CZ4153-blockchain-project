@@ -45,7 +45,7 @@ export const placeBid = async (amount) => {
                 {
                     from: ethereum.selectedAddress,
                     to: localAuctionAddress,
-                    value: web3.utils.toWei(amount),
+                    value: web3.utils.toHex(web3.utils.toWei(amount)),
                     data: web3.eth.abi.encodeFunctionCall(
                         {
                             name: "stakeBid",

@@ -10,6 +10,6 @@ module.exports = function (deployer) {
   // deployer is an object provided by Truffle to handle migration
   deployer.deploy(Bank); // now, we ask deployer to deploy our Bank.sol contract
   deployer.deploy(HuiToken).then(function() {
-    return deployer.deploy(Auction, HuiToken.address, 10);
+    return deployer.deploy(Auction, HuiToken.address, 10,2);
   });
 };
