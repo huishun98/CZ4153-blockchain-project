@@ -79,9 +79,11 @@ class App extends React.Component {
   }
   // FUNCTION TO GET USER'S BID
   _updateUsersBid = async () => {
-    const usersBidInWei = await getUsersBid();
-    const usersBid = (usersBidInWei/ 10 ** 18).toFixed(5)
-    console.log({ usersBid })
+    let usersBid = 0;
+    await getUsersBid().then((usersBidInWei) => {
+      const usersBid = (usersBidInWei / 10 ** 18).toFixed(5)
+      console.log({ usersBid })
+    }).catch(err => { }); // user has not bidded
     this.setState({ usersBid })
     return usersBid
   }
