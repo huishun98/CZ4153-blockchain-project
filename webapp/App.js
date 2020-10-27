@@ -68,7 +68,7 @@ class App extends React.Component {
   _updateTokensLeft = async () => {
     const weiRaised = await getWeiRaised();
     const currentTokenPrice = await this._updateCurrentTokenPrice();
-    this.setState({ tokensLeft: (1000 - weiRaised / 10 ** 18 / currentTokenPrice).toFixed(5) })
+    this.setState({ tokensLeft: (1000 - weiRaised / 10 ** 18 / currentTokenPrice).toFixed(2) })
   }
   // FUNCTION TO GET CURRENT TOKEN PRICE
   _updateCurrentTokenPrice = async () => {
@@ -81,11 +81,14 @@ class App extends React.Component {
   _updateUsersBid = async () => {
     let usersBid = 0;
     await getUsersBid().then((usersBidInWei) => {
-      const usersBid = (usersBidInWei / 10 ** 18).toFixed(5)
+      const usersBid = (usersBidInWei / 10 ** 18).toFixed(2)
       console.log({ usersBid })
-    }).catch(err => { }); // user has not bidded
-    this.setState({ usersBid })
-    return usersBid
+      this.setState({ usersBid })
+      return usersBid
+    }).catch(err => {
+      this.setState({ usersBid: 0 })
+      return 0
+    }); // user has not bidded
   }
 
   // TODO - START AUCTION
@@ -183,11 +186,11 @@ class App extends React.Component {
             </div>
             <div className={`section-wrapper ${this.state.tab == 1 ? "" : "hide"}`}>
               <p>Total bids: <span className="highlight bold">{this.state.usersBid} ETH</span></p>
-              <p>Total potential minimum token: <span className="highlight bold">{(this.state.usersBid / this.state.currentTokenPrice).toFixed(5)} tokens</span></p>
+              <p>Total potential minimum token: <span className="highlight bold">{(this.state.usersBid / this.state.currentTokenPrice).toFixed(2)} tokens</span></p>
               <button className={`btn btn-secondary`} onClick={this._collectTokens.bind(this)}>Claim tokens</button>
             </div>
             {/* ${this.state.stage !== "2" ? "disabled" : ""} */}
-            <a href="#" className="" onClick={this.updateStates.bind(this)}>Update State (only for debugging purposes)</a>
+            {/* <a href="#" className="" onClick={this.updateStates.bind(this)}>Update State (only for debugging purposes)</a> */}
           </div>
         </div>
       </div>

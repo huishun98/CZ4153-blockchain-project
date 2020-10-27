@@ -114,10 +114,9 @@ contract Auction {
         stage = Stages.AuctionEnded;
     }
 
-    function stakeBid(uint256 amount) public payable atStage(Stages.AuctionStarted) {
+    function stakeBid() public payable atStage(Stages.AuctionStarted) { 
         require(msg.sender != address(0));
         require(msg.value > 0, "amount cannot be 0 or less");
-        require(msg.value == amount, "amount indicated does not match msg.value!");
         require(((weiRaised+msg.value)/calcCurrentTokenPrice()) <= totalSupply, "demand exceeds supply!");
 
         weiRaised += msg.value;
