@@ -13,7 +13,7 @@ contract Auction {
     uint256 public closingRate; 
 
     uint256 public totalPotMinTokens;
-    uint256 public totalSupply; 
+    uint256 public totalTokenBalance; 
     uint public tokensLeft;
 
     uint256 public openingTime;
@@ -28,11 +28,6 @@ contract Auction {
         AuctionDeployed,
         AuctionStarted,
         AuctionEnded
-    }
-
-    modifier onlyWhileOpen {
-        require(block.timestamp >= openingTime && block.timestamp <= closingTime);
-        _;
     }
 
     modifier atStage(Stages _stage) {
@@ -63,65 +58,78 @@ contract Auction {
         _;
     }
 
-
+    modifier checkForAuctionTimeOut() {
+        if (stage == Stages.AuctionStarted && now >= closingTime)
+            terminateAuction(); //set closing price and set stage = AuctionEnded
+        _;
+    }
 
     event BidStaked(address beneficiary, uint256 amount);
 
     constructor(HuiToken _huiToken, uint256 _openingRate, uint256 _reserveRate) public {
+        require(_openingRate > 0);
+        require(_reserveRate > 0);
+        // require(address(huiToken) != address(0));
+
         huiToken = _huiToken;
-        owner = msg.sender; //owner is the EOA that created this contract 
+        owner = msg.sender; 
         wallet = address(this);
-        // huiToken.transferFrom(huiToken.getTokenOwner(), wallet, huiToken.balanceOf(owner)); //transfer all tokens to this contract 
-        // huiToken.transfer(owner, 1);
+
         openingRate = _openingRate;
         reserveRate = _reserveRate;
 
         totalPotMinTokens = 0;
-        totalSupply = huiToken.totalSupply();
+        totalTokenBalance = huiToken.balanceOf(address(this));
+
+        stage = Stages.AuctionDeployed;
     }
 
-    function getBalance() public view returns (uint256) {
-        return wallet.balance;
-    }
-
-    function withdraw() public isOwner atStage(Stages.AuctionEnded){
+    function withdraw() public isOwner {
         msg.sender.transfer(wallet.balance);
     }
 
-    function calcCurrentTokenPrice() public returns (uint256) {
+    function calcCurrentTokenPrice() public checkForAuctionTimeOut returns (uint256) {
         if (stage == Stages.AuctionDeployed) {
             return openingRate;
         } 
-        if (stage == Stages.AuctionStarted || stage == Stages.AuctionEnded) {
-            return ((openingRate-reserveRate)*(now-openingTime)/(20 minutes) + openingRate);
+
+        else {
+            if (stage == Stages.AuctionEnded) {
+                return closingRate;
+            }
+
+            else {
+                uint delta = (openingRate-reserveRate)*(now-openingTime)/(20*60);
+                return (openingRate - delta);
+            }
         }
-    }
-
-    function randomFunction () public onlyWhileOpen {
 
     }
 
-    function startAuction() public isOwner atStage(Stages.AuctionDeployed) returns (Stages) { // 
+    function startAuction() public isOwner atStage(Stages.AuctionDeployed) {
         stage = Stages.AuctionStarted;
         openingTime = now;
         closingTime = openingTime + 20 minutes;
-        return stage;
-
         // TODO - ADD ETHEREUM ALARM CLOCK TO END FUNCTION WHEN 20 MINUTES IS UP.
     }
 
     function terminateAuction() internal {
+        closingRate = calcCurrentTokenPrice();
         stage = Stages.AuctionEnded;
     }
 
-    function stakeBid() public payable atStage(Stages.AuctionStarted) { 
+    function stakeBid() public payable checkForAuctionTimeOut atStage(Stages.AuctionStarted) {
         require(msg.sender != address(0));
         require(msg.value > 0, "amount cannot be 0 or less");
-        require(((weiRaised+msg.value)/calcCurrentTokenPrice()) <= totalSupply, "demand exceeds supply!");
-
-        weiRaised += msg.value;
-        totalBidAmt[msg.sender] += msg.value; // TODO - CHECK IF VALUE ADDED IS CORRECT
-        tokensLeft = totalSupply - (weiRaised/calcCurrentTokenPrice());
+        uint256 weiAmount = msg.value;
+        require(((weiRaised+weiAmount)/calcCurrentTokenPrice()) <= totalTokenBalance, "demand exceeds supply!");
+        
+        weiRaised += weiAmount;
+        if ((weiRaised/calcCurrentTokenPrice()) == totalTokenBalance) {
+            terminateAuction();
+        }
+        
+        // TODO - CHECK IF VALUE ADDED IS CORRECT
 
         if(isBidding[msg.sender] == true) {
             totalBidAmt[msg.sender] += msg.value;
@@ -134,16 +142,15 @@ contract Auction {
         // emit BidStaked(_beneficiary, msg.value);
     }
 
-    // GETTERS
-    function getBid() public view callerIsBidding returns (uint256) {
+    function getBid() public checkForAuctionTimeOut callerIsBidding returns (uint256) {
         return totalBidAmt[msg.sender];
     }
 
     // TODO - ALLOW USER TO CLAIM TOKENS
-    function claimTokens() public callerIsBidding { //atStage(Stages.AuctionEnded)
+    function claimTokens() public checkForAuctionTimeOut callerIsBidding atStage(Stages.AuctionEnded) {
         uint userBidAmt = totalBidAmt[msg.sender]; 
         totalBidAmt[msg.sender] = 0;
-        uint tokensOwed = userBidAmt/calcCurrentTokenPrice(); 
+        uint256 tokensOwed = userBidAmt/closingRate; 
         huiToken.transfer(msg.sender, tokensOwed); // TODO - BUG - VM Exception while processing transaction: revert ERC20: transfer amount exceeds balance
     }
 }
