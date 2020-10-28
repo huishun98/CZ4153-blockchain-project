@@ -37,7 +37,6 @@ export const collectTokens = async () => {
 }
 
 export const placeBid = async (amount) => {
-    console.log(ethereum.selectedAddress)
     const provider = await detectEthereumProvider();
     if (provider) {
         ethereum.request({
