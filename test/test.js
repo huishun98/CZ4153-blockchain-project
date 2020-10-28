@@ -1,32 +1,26 @@
 const {BN, ether, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
+const truffleAssert = require('truffle-assertions');
 
 const HuiToken = artifacts.require("HuiToken");
 const Auction = artifacts.require("Auction");
 
 function tokens(n) {
-  return web3.utils.toWei(n, 'ether');
+  return web3.utils.toWei(n, 'ether').toString();
 }
 
 contract("Auction", async ([deployer, investor1, investor2]) => {
-  let auction, huiToken
-
-  before(async() => {
-    await time.advanceBlock();
-    this.openingTime = (await time.latest());
-    this.closingTime = this.openingTime.add(time.duration.minutes(20));
-    this.afterClosingTime = this.closingTime.add(time.duration.seconds(1));
-    huiToken = await HuiToken.deployed({from: deployer});
-    auction = await Auction.deployed(huiToken.address, 10, 2);
-
-    await huiToken.transfer(auction.address, tokens('1000'), {from: deployer})
-  })
-
-  beforeEach(async () => {
-    await time.advanceBlock();
-  })
-
   describe("Auction deployemnet", async () => {
+    let auction, huiToken, openingTime, closingTime, afterClosingTime;
+
+    beforeEach(async() => {
+      openingTime = (await time.latest());
+      closingTime = openingTime.add(time.duration.minutes(20));
+      afterClosingTime = closingTime.add(time.duration.seconds(1));
+      huiToken = await HuiToken.new({from: deployer});
+      auction = await Auction.new(huiToken.address, 10, 2);
+      await huiToken.transfer(auction.address, tokens('1000'), {from: deployer})
+    })
     it("has owner == deployer", async () => {
       let owner = await auction.owner(); // call the getter on public state variable, https://solidity.readthedocs.io/en/v0.7.1/contracts.html#getter-functions
       assert.equal(owner, deployer); // compare the expected owner with the actual owner
@@ -34,33 +28,19 @@ contract("Auction", async ([deployer, investor1, investor2]) => {
   
     it("should have token balance == total token supply", async() => {
       let totalTokenSupply = await huiToken.totalSupply();
-      assert.equal(totalTokenSupply, 1000);
+      assert.equal(totalTokenSupply.toString(), tokens('1000'));
     });
 
     it("should have total token supply", async() => {
       let totalTokenBalance = await huiToken.balanceOf(auction.address);
-      assert.equal(totalTokenBalance, 1000);
+      assert.equal(totalTokenBalance.toString(), tokens('1000'));
+    })
+
+    describe("when 10 minutes has passed", async() => {
+
     })
   })
 
-  describe('auction functions', async () => {
-    before(async function() {
-      // Advance to the next block to correctly read time in the solidity "now" function interpreted by ganache
-      await time.advanceBlock();
-    })
-
-    beforeEach(async function () {
-      this.openingTime = (await time.latest()).add(time.duration.weeks(1));
-      this.closingTime = this.openingTime.add(time.duration.minutes(20));
-      this.afterClosingTime = this.closingTime.add(time.duration.seconds(1));
-    });
-
-    context('with auction', function() {
-      beforeEach(async () => {
-        this.auction = await 
-      })
-    })
-  })
   
 
     // it("can deposit correctly", async () => {

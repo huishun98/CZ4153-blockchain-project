@@ -145,11 +145,11 @@ contract Auction {
         return totalBidAmt[msg.sender];
     }
 
-    // TODO - ALLOW USER TO CLAIM TOKENS
-    function claimTokens() public callerIsBidding atStage(Stages.AuctionEnded) { // checkForAuctionTimeOut
+    function claimTokens() public callerIsBidding atStage(Stages.AuctionEnded) returns (uint256) { // checkForAuctionTimeOut 
         uint userBidAmt = totalBidAmt[msg.sender]; 
         totalBidAmt[msg.sender] = 0;
-        uint256 tokensOwed = userBidAmt/closingRate; 
-        huiToken.transfer(msg.sender, tokensOwed); // TODO - BUG - VM Exception while processing transaction: revert ERC20: transfer amount exceeds balance
+        uint256 tokensOwed = userBidAmt/closingRate; // put back later = 
+        huiToken.transfer(msg.sender, tokensOwed);
+        return huiToken.balanceOf(msg.sender);
     }
 }

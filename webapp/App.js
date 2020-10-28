@@ -14,7 +14,6 @@ class App extends React.Component {
       timeLeft: "",
       stage: null,
       usersBid: 0,
-
       // ONLY ON FRONTEND
       inputBid: '',
       countingDown: false,
@@ -65,7 +64,7 @@ class App extends React.Component {
 
       if (this._updateStage() !== "2") {
         await terminateAuction()
-        this.updateStates()
+        this._updateStage()
       }
     }
 
@@ -77,7 +76,7 @@ class App extends React.Component {
   _updateTokensLeft = async () => {
     const weiRaised = await getWeiRaised();
     const currentTokenPrice = await this._updateCurrentTokenPrice();
-    this.setState({ tokensLeft: (1000 - weiRaised / 10 ** 18 / currentTokenPrice).toFixed(2) })
+    this.setState({ tokensLeft: (1000 - weiRaised / 10 ** 18 / currentTokenPrice).toFixed(0) })
   }
   // FUNCTION TO GET CURRENT TOKEN PRICE
   _updateCurrentTokenPrice = async () => {
@@ -90,7 +89,7 @@ class App extends React.Component {
       const openingTime = await getOpeningTime();
       const now = new Date();
       const delta = (openingRate - reserveRate) * (now - openingTime) / (20 * 60 * 1000);
-      currentTokenPrice = (openingRate - delta).toFixed(2);
+      currentTokenPrice = (openingRate - delta).toFixed(0);
     } else if (this.state.stage == "2") {
       currentTokenPrice = await getClosingRate();
     }
@@ -100,7 +99,6 @@ class App extends React.Component {
   }
   // FUNCTION TO GET USER'S BID
   _updateUsersBid = async () => {
-    let usersBid = 0;
     await getUsersBid().then((usersBidInWei) => {
       const usersBid = (usersBidInWei / 10 ** 18).toFixed(2)
       console.log({ usersBid })
@@ -112,10 +110,8 @@ class App extends React.Component {
     }); // user has not bidded
   }
 
-  // TODO - START AUCTION
   _startAuction = async () => {
     await startAuction()
-    // this.updateStates()
     this._updateStage()
   }
 
@@ -124,7 +120,9 @@ class App extends React.Component {
   }
 
   _collectTokens = async () => {
-    await collectTokens()
+    await collectTokens().then(numOfTokens => {
+      alert(`You claimed ${numOfTokens.toFixed(0)} tokens!`)
+    });
   }
 
   // FRONTEND FUNCTIONS
@@ -208,7 +206,7 @@ class App extends React.Component {
             </div>
             <div className={`section-wrapper ${this.state.tab == 1 ? "" : "hide"}`}>
               <p>Total bids: <span className="highlight bold">{this.state.usersBid} ETH</span></p>
-              <p>Total potential minimum token: <span className="highlight bold">{(this.state.usersBid / this.state.currentTokenPrice).toFixed(2)} tokens</span></p>
+              <p>Total potential minimum token: <span className="highlight bold">{(this.state.usersBid / this.state.currentTokenPrice).toFixed(0)} tokens</span></p>
               <button className={`btn btn-secondary`} onClick={this._collectTokens.bind(this)}>Claim tokens</button>
             </div>
             {/* ${this.state.stage !== "2" ? "disabled" : ""} */}
