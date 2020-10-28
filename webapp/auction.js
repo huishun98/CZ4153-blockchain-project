@@ -71,6 +71,14 @@ export const terminateAuction = async () => {
 }
 
 // GETTING DATA
+export const checkNumOfTokens = async () => {
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        return contract.methods.checkNumOfTokens().call({ from: localAccountAddress })
+    } else {
+        console.log("Please install MetaMask!");
+    }
+};
 export const getUsersBid = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {

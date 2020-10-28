@@ -128,8 +128,6 @@ contract Auction {
             terminateAuction();
         }
         
-        // TODO - CHECK IF VALUE ADDED IS CORRECT
-
         if(isBidding[msg.sender] == true) {
             totalBidAmt[msg.sender] += msg.value;
         }
@@ -145,11 +143,14 @@ contract Auction {
         return totalBidAmt[msg.sender];
     }
 
-    function claimTokens() public callerIsBidding atStage(Stages.AuctionEnded) returns (uint256) { // checkForAuctionTimeOut 
+    function checkNumOfTokens() public view returns (uint256) { // atStage(Stages.AuctionEnded)
+       return huiToken.balanceOf(msg.sender);
+    }
+
+    function claimTokens() public callerIsBidding atStage(Stages.AuctionEnded) {
         uint userBidAmt = totalBidAmt[msg.sender]; 
         totalBidAmt[msg.sender] = 0;
-        uint256 tokensOwed = userBidAmt/closingRate; // put back later = 
+        uint256 tokensOwed = userBidAmt/(10**18)/closingRate; 
         huiToken.transfer(msg.sender, tokensOwed);
-        return huiToken.balanceOf(msg.sender);
     }
 }

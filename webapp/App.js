@@ -1,5 +1,5 @@
 import React from "react";
-import { getTotalTokenBalance, terminateAuction, getClosingRate, getOpeningRate, getOpeningTime, getReserveRate, getStage, startAuction, getClosingTime, getWeiRaised, placeBid, collectTokens, getUsersBid } from "./auction.js"
+import { checkNumOfTokens, getTotalTokenBalance, terminateAuction, getClosingRate, getOpeningRate, getOpeningTime, getReserveRate, getStage, startAuction, getClosingTime, getWeiRaised, placeBid, collectTokens, getUsersBid } from "./auction.js"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -120,9 +120,9 @@ class App extends React.Component {
   }
 
   _collectTokens = async () => {
-    await collectTokens().then(numOfTokens => {
-      alert(`You claimed ${numOfTokens.toFixed(0)} tokens!`)
-    });
+    await collectTokens()
+    const tokens = await checkNumOfTokens()
+    alert(`You claimed ${tokens} tokens!`)
   }
 
   // FRONTEND FUNCTIONS

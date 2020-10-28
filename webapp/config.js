@@ -2,7 +2,7 @@ const myAddress = "0x0a5b6EcceE0C07dA979A8f3932d3d324989F7B72"; // PLEASE CHANGE
 const infuraWSS = `wss://ropsten.infura.io/ws/v3/0bd538a9051748f8b19ce2eb509c89a8`; // PLEASE CHANGE IT TO YOURS
 const Testnet = "ropsten";
 const auctionAddress = "0x2A88bab232754F7c02b653E5789A40eB342202ED" // PLEASE CHANGE IT TO YOURS
-const localAuctionAddress = "0xA0591db19604d49c49592e876E08D53cf9675627" // PLEASE CHANGE IT TO YOURS 
+const localAuctionAddress = "0xBcff94c4Fea71DBDbEB2c7838aaB2f4D28A6f404" // PLEASE CHANGE IT TO YOURS 
 const localOwnerAddress = "0x7E38Bdc18466844aEAd5dBe0EE708f3bf412fe1e" // PLEASE CHANGE IT TO YOURS // must be owner's acc
 const localAccountAddress = "0xdEdfDDa95770c8f2dFB38F11CFF8C0FfACED3E4e" // PLEASE CHANGE IT TO YOURS // must be account you're using to bid
 
