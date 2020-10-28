@@ -1,5 +1,5 @@
 import React from "react";
-import { getCurrentTokenPrice, getStage, startAuction, getClosingTime, getWeiRaised, placeBid, collectTokens, getUsersBid } from "./auction.js"
+import { getTotalTokenBalance, terminateAuction, getClosingRate, getOpeningRate, getOpeningTime, getReserveRate, getStage, startAuction, getClosingTime, getWeiRaised, placeBid, collectTokens, getUsersBid } from "./auction.js"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -26,6 +26,9 @@ class App extends React.Component {
   async componentDidMount() {
     // FUNCTION TO CHECK STAGE OF AUCTION (STARTED? ENDED?)
     this.updateStates()
+
+    const totalTokens = await getTotalTokenBalance()
+    console.log({ totalTokens })
 
     // TODO - WATCH FOR EMITS (E.G. ENDING ETC.)
     // let event = contractInstance.event()
@@ -59,7 +62,13 @@ class App extends React.Component {
       this.setState({ countingDown: false })
       alert('Auction has ended.')
       timeLeft = 0
+
+      if (this._updateStage() !== "2") {
+        await terminateAuction()
+        this.updateStates()
+      }
     }
+
     console.log({ timeLeft })
     this.setTimeState(timeLeft)
     return timeLeft
@@ -72,7 +81,19 @@ class App extends React.Component {
   }
   // FUNCTION TO GET CURRENT TOKEN PRICE
   _updateCurrentTokenPrice = async () => {
-    const currentTokenPrice = await getCurrentTokenPrice();
+    // const currentTokenPrice = await getCurrentTokenPrice();
+    const reserveRate = await getReserveRate();
+    const openingRate = await getOpeningRate();
+    let currentTokenPrice = openingRate;
+
+    if (this.state.stage == "1") {
+      const openingTime = await getOpeningTime();
+      const now = new Date();
+      const delta = (openingRate - reserveRate) * (now - openingTime) / (20 * 60 * 1000);
+      currentTokenPrice = (openingRate - delta).toFixed(2);
+    } else if (this.state.stage == "2") {
+      currentTokenPrice = await getClosingRate();
+    }
     console.log({ currentTokenPrice })
     this.setState({ currentTokenPrice })
     return currentTokenPrice
@@ -94,7 +115,8 @@ class App extends React.Component {
   // TODO - START AUCTION
   _startAuction = async () => {
     await startAuction()
-    this.updateStates()
+    // this.updateStates()
+    this._updateStage()
   }
 
   _placeBid = async (amt) => {

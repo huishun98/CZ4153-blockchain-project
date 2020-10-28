@@ -35,9 +35,7 @@ export const collectTokens = async () => {
         console.log("Please install MetaMask!");
     }
 }
-
 export const placeBid = async (amount) => {
-    console.log(ethereum.selectedAddress)
     const provider = await detectEthereumProvider();
     if (provider) {
         ethereum.request({
@@ -63,6 +61,14 @@ export const placeBid = async (amount) => {
         console.log("Please install MetaMask!");
     }
 };
+export const terminateAuction = async () => {
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        return contract.methods.terminateAuction().send({ from: localAccountAddress })
+    } else {
+        console.log("Please install MetaMask!");
+    }
+}
 
 // GETTING DATA
 export const getUsersBid = async () => {
@@ -98,10 +104,54 @@ export const getWeiRaised = async () => {
         console.log("Please install MetaMask!");
     }
 };
+export const getOpeningTime = async () => {
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        const openingTime = await contract.methods.openingTime().call()
+        return new Date(openingTime * 1000)
+    } else {
+        console.log("Please install MetaMask!");
+    }
+};
+export const getReserveRate = async () => {
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        return contract.methods.reserveRate().call()
+    } else {
+        console.log("Please install MetaMask!");
+    }
+};
+export const getOpeningRate = async () => {
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        return contract.methods.openingRate().call()
+    } else {
+        console.log("Please install MetaMask!");
+    }
+};
+export const getClosingRate = async () => {
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        return contract.methods.closingRate().call()
+    } else {
+        console.log("Please install MetaMask!");
+    }
+};
+
 export const getCurrentTokenPrice = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
         return contract.methods.calcCurrentTokenPrice().call()
+    } else {
+        console.log("Please install MetaMask!");
+    }
+};
+
+
+export const getTotalTokenBalance = async () => {
+    const provider = await detectEthereumProvider();
+    if (provider) {
+        return contract.methods.totalTokenBalance().call()
     } else {
         console.log("Please install MetaMask!");
     }
