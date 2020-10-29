@@ -1,4 +1,5 @@
-pragma solidity ^0.6.2;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.4.22 <0.8.0;
 
 import "./HuiToken.sol";
 
@@ -64,11 +65,12 @@ contract Auction {
     //     _;
     // }
 
-    // modifier checkForAuctionTimeOut() {
-    //     if (stage == Stages.AuctionStarted && now >= closingTime)
-    //         terminateAuction(); //set closing price and set stage = AuctionEnded
-    //     _;
-    // }
+    modifier checkForAuctionTimeOut() {
+        if (stage == Stages.AuctionStarted && now >= closingTime)
+            terminateAuction(); //set closing price and set stage = AuctionEnded
+        _;
+    }
+
 
     event BidStaked(address beneficiary, uint256 amount);
 
@@ -109,13 +111,16 @@ contract Auction {
         stage = Stages.AuctionStarted;
         openingTime = now;
         closingTime = openingTime + 20 minutes;
-        // TODO - ADD ETHEREUM ALARM CLOCK TO END FUNCTION WHEN 20 MINUTES IS UP.
-
+    
     }
 
     function terminateAuction() internal {
+        //When Auction ends, stop clock
+        //Money sent from owners to senders via Claim Tokens
+        
         closingRate = calcCurrentTokenPrice();
         stage = Stages.AuctionEnded;
+        claimTokens();
     }
 
     function stakeBid() public payable atStage(Stages.AuctionStarted) { // checkForAuctionTimeOut
