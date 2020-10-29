@@ -94,7 +94,7 @@ contract Auction {
         msg.sender.transfer(wallet.balance);
     }
 
-    function calcCurrentTokenPrice() internal view returns (uint256) { // checkForAuctionTimeOut // note that this only works when transaction is sent
+    function calcCurrentTokenPrice() public view returns (uint256) { // checkForAuctionTimeOut // note that this only works when transaction is sent
         if (stage == Stages.AuctionDeployed) {
             return openingRate;
         }
@@ -110,9 +110,10 @@ contract Auction {
         openingTime = now;
         closingTime = openingTime + 20 minutes;
         // TODO - ADD ETHEREUM ALARM CLOCK TO END FUNCTION WHEN 20 MINUTES IS UP.
+
     }
 
-    function terminateAuction() public {
+    function terminateAuction() internal {
         closingRate = calcCurrentTokenPrice();
         stage = Stages.AuctionEnded;
     }
