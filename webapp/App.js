@@ -30,7 +30,6 @@ class App extends React.Component {
   // FUNCTION TO GET STAGE
   _updateStage = async () => {
     const stage = await getStage()
-    console.log({ stage })
     this.setState({ stage })
 
     // if auction has started and counting down has not started, start countdown
@@ -181,7 +180,6 @@ class App extends React.Component {
                 <p>{this.state.timeLeft} min</p>
               </div>
               <button className={`btn btn-secondary`} onClick={this._startAuction.bind(this)}>Start Auction</button>
-              {/* ${this.state.stage !== "0" ? "disabled" : ""} */}
             </div>
             <div className="flex">
               <button className={`btn btn-half ${this.state.tab == 0 ? "active" : ""}`} onClick={this.toggleTab.bind(this, 0)}>Place Bid</button>
@@ -192,15 +190,12 @@ class App extends React.Component {
               <p>Place bid (in ETH)</p>
               <input className="form-control" type="number" min="1" placeholder="100" value={this.state.inputBid} onChange={this.setBid.bind(this)} ></input>
               <button className={`btn btn-secondary`} onClick={this.submitBid.bind(this)}>Submit bid</button>
-              {/* ${this.state.stage !== "1" ? "disabled" : ""} */}
             </div>
             <div className={`section-wrapper ${this.state.tab == 1 ? "" : "hide"}`}>
               <p>Total bids: <span className="highlight bold">{this.state.usersBid} ETH</span></p>
-              <p>Total potential minimum token: <span className="highlight bold">{(this.state.usersBid / this.state.currentTokenPrice).toFixed(0)} tokens</span></p>
+              <p>Total potential minimum tokens: <span className="highlight bold">{(this.state.usersBid / this.state.currentTokenPrice).toFixed(0)} tokens</span></p>
               <button className={`btn btn-secondary`} onClick={this._collectTokens.bind(this)}>Claim tokens</button>
             </div>
-            {/* ${this.state.stage !== "2" ? "disabled" : ""} */}
-            {/* <a href="#" className="" onClick={this.updateStates.bind(this)}>Update State (only for debugging purposes)</a> */}
           </div>
         </div>
       </div>

@@ -18,11 +18,11 @@ For project instructions, see [ProjectA_DevProject.docx](ProjectA_DevProject.doc
 
 ## Running development server (locally)
 
-1. Open Ganache to start local server. Get account address and update config.js in webapp/config.js.
+1. Open Ganache to start local server.
 2. In project root, run `truffle migrate`.
-3. Get contract address of 'Auction' contract and update config.js in webapp/config.js.
+3. Get contract address of 'Auction' contract and update localAuctionAddress in webapp/config.js.
 4. To start dApp, enter `webapp` directory and run `npm start`.
-5. Log into Metamask to conduct transactions
+5. Log into Metamask to conduct transactions.
 
 ## To add:
 1. Why we count time in the frontend as well
