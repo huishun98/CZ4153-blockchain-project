@@ -67,7 +67,8 @@ class App extends React.Component {
   _updateTokensLeft = async () => {
     const weiRaised = await getWeiRaised();
     const currentTokenPrice = await this._updateCurrentTokenPrice();
-    this.setState({ tokensLeft: (1000 - weiRaised / 10 ** 18 / currentTokenPrice).toFixed(0) })
+    const totalTokenSupply = (await getTotalTokenBalance())/(10**18);
+    this.setState({ tokensLeft: (totalTokenSupply - weiRaised / 10 ** 18 / currentTokenPrice).toFixed(0) })
   }
   // FUNCTION TO GET CURRENT TOKEN PRICE
   _updateCurrentTokenPrice = async () => {

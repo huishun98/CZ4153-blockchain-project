@@ -5,6 +5,6 @@ const Testnet = "ropsten";
 const auctionAddress = "0x2A88bab232754F7c02b653E5789A40eB342202ED"
 
 // FOR LOCAL DEPLOYMENT
-const localAuctionAddress = "0x6c48B8990ddf8f08B86f45aA3782C19EE293FF51" // PLEASE CHANGE IT TO YOURS 
+const localAuctionAddress = "0xD55ff9E0Fdc9f816a7F836C18D823B21a2e63882" // PLEASE CHANGE IT TO YOURS 
 
 export { myAddress, infuraWSS, Testnet, auctionAddress, localAuctionAddress }
