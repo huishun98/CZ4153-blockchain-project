@@ -67,7 +67,7 @@ class App extends React.Component {
   _updateTokensLeft = async () => {
     const weiRaised = await getWeiRaised();
     const currentTokenPrice = await this._updateCurrentTokenPrice();
-    const totalTokenSupply = (await getTotalTokenBalance())/(10**18);
+    const totalTokenSupply = (await getTotalTokenBalance()) / (10 ** 18);
     this.setState({ tokensLeft: (totalTokenSupply - weiRaised / 10 ** 18 / currentTokenPrice).toFixed(0) })
   }
   // FUNCTION TO GET CURRENT TOKEN PRICE
@@ -89,14 +89,26 @@ class App extends React.Component {
   }
   // FUNCTION TO GET USER'S BID
   _updateUsersBid = async () => {
+    let counter = 0;
     await getUsersBid().then((usersBidInWei) => {
+      if (usersBidInWei == null && counter < 5) {
+        counter += 1
+        const _this = this
+        setTimeout(function () {
+          _this._updateUsersBid()
+        }, 500)
+        return
+      } else if (usersBidInWei == null) {
+        console.log("Please select an ethereum address.")
+      }
       const usersBid = (usersBidInWei / 10 ** 18).toFixed(2)
       this.setState({ usersBid })
       return usersBid
     }).catch(err => {
+      console.log({ err })
       this.setState({ usersBid: 0 })
       return 0
-    }); // user has not bidded
+    });
   }
 
   _startAuction = async () => {
@@ -112,7 +124,8 @@ class App extends React.Component {
     await collectTokens()
     const hui = await checkNumOfTokens()
     const tokens = hui / (10 ** 18)
-    alert(`You claimed ${tokens} tokens!`)
+    alert(`Account token balance: ${tokens} tokens!`)
+    this._updateUsersBid()
   }
 
   // FRONTEND FUNCTIONS

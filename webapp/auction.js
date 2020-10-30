@@ -80,7 +80,10 @@ export const checkNumOfTokens = async () => {
 };
 export const getUsersBid = async () => {
     const provider = await detectEthereumProvider();
-    if (provider) {
+
+    if (ethereum.selectedAddress == null) {
+        return null
+    } else if (provider) {
         return contract.methods.totalBidAmt(ethereum.selectedAddress).call()
     } else {
         console.log("Please install MetaMask!");
