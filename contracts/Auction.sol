@@ -89,7 +89,7 @@ contract Auction {
         stage = Stages.AuctionDeployed;
     }
 
-    function withdraw() public isOwner atStage(Stages.AuctionEnded){
+    function withdraw() public isOwner {
         uint excessTokens = totalTokenBalance - totalPotMinTokens;
         huiToken.burnTokens(excessTokens);
         msg.sender.transfer(wallet.balance);

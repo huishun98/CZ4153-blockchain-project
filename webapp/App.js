@@ -100,6 +100,7 @@ class App extends React.Component {
         return
       } else if (usersBidInWei == null) {
         console.log("Please select an ethereum address.")
+        return
       }
       const usersBid = (usersBidInWei / 10 ** 18).toFixed(2)
       this.setState({ usersBid })
