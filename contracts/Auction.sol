@@ -110,17 +110,12 @@ contract Auction {
         stage = Stages.AuctionStarted;
         openingTime = now;
         closingTime = openingTime + 20 minutes;
-    
     }
 
-    function terminateAuction() internal {
-        //When Auction ends, stop clock
-        //Money sent from owners to senders via Claim Tokens
-        
+    function terminateAuction() public {
         closingRate = calcCurrentTokenPrice();
         totalPotMinTokens = weiRaised/closingRate;
         stage = Stages.AuctionEnded;
-        claimTokens();
     }
 
     function stakeBid() external payable checkForAuctionTimeOut atStage(Stages.AuctionStarted){
@@ -144,10 +139,6 @@ contract Auction {
 
         // emit BidStaked(_beneficiary, msg.value);
     }
-
-    // function getBid() public view callerIsBidding returns (uint256) { // checkForAuctionTimeOut
-    //     return totalBidAmt[msg.sender];
-    // }
 
     function checkNumOfTokens() public view returns (uint256) { // atStage(Stages.AuctionEnded)
        return huiToken.balanceOf(msg.sender);

@@ -3,7 +3,7 @@ import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
 import { infuraWSS } from './config'
 import {
-    auctionAddress, localAuctionAddress, localAccountAddress, localOwnerAddress
+    auctionAddress, localAuctionAddress
 } from "./config.js"
 import artifact from "../build/contracts/Auction.json";
 
@@ -19,7 +19,6 @@ const contract = new web3.eth.Contract(artifact.abi, localAuctionAddress);
 
 export const startAuction = async () => {
     // Using MetaMask API to send transaction
-    console.log(ethereum.selectedAddress);
     const provider = await detectEthereumProvider();
     if (provider) {
         return contract.methods.startAuction().send({ from: ethereum.selectedAddress })
@@ -74,7 +73,7 @@ export const terminateAuction = async () => {
 export const checkNumOfTokens = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
-        return contract.methods.checkNumOfTokens({ from: ethereum.selectedAddress }).call()
+        return contract.methods.checkNumOfTokens().call({ from: ethereum.selectedAddress })
     } else {
         console.log("Please install MetaMask!");
     }
@@ -145,14 +144,6 @@ export const getClosingRate = async () => {
         console.log("Please install MetaMask!");
     }
 };
-// export const getCurrentTokenPrice = async () => {
-//     const provider = await detectEthereumProvider();
-//     if (provider) {
-//         return contract.methods.calcCurrentTokenPrice().call()
-//     } else {
-//         console.log("Please install MetaMask!");
-//     }
-// };
 export const getTotalTokenBalance = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {

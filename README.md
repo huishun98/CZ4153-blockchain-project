@@ -24,3 +24,6 @@ For project instructions, see [ProjectA_DevProject.docx](ProjectA_DevProject.doc
 4. To start dApp, enter `webapp` directory and run `npm start`.
 5. Log into Metamask to conduct transactions
 
+## To add:
+1. Why we count time in the frontend as well
+2. Assumptions: transfer all tokens to contract (100)

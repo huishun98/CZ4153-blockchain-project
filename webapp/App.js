@@ -25,13 +25,6 @@ class App extends React.Component {
   async componentDidMount() {
     // FUNCTION TO CHECK STAGE OF AUCTION (STARTED? ENDED?)
     this.updateStates()
-
-    const totalTokens = await getTotalTokenBalance()
-    console.log({ totalTokens })
-
-    // TODO - WATCH FOR EMITS (E.G. ENDING ETC.)
-    // let event = contractInstance.event()
-    // event.watch(callback)
   }
 
   // FUNCTION TO GET STAGE
@@ -62,13 +55,12 @@ class App extends React.Component {
       alert('Auction has ended.')
       timeLeft = 0
 
-      if (this._updateStage() !== "2") {
+      const stage = await getStage()
+      if (stage !== "2") {
         await terminateAuction()
         this._updateStage()
       }
     }
-
-    console.log({ timeLeft })
     this.setTimeState(timeLeft)
     return timeLeft
   }
@@ -80,7 +72,6 @@ class App extends React.Component {
   }
   // FUNCTION TO GET CURRENT TOKEN PRICE
   _updateCurrentTokenPrice = async () => {
-    // const currentTokenPrice = await getCurrentTokenPrice();
     const reserveRate = await getReserveRate();
     const openingRate = await getOpeningRate();
     let currentTokenPrice = openingRate;
@@ -93,7 +84,6 @@ class App extends React.Component {
     } else if (this.state.stage == "2") {
       currentTokenPrice = await getClosingRate();
     }
-    console.log({ currentTokenPrice })
     this.setState({ currentTokenPrice })
     return currentTokenPrice
   }
@@ -101,7 +91,6 @@ class App extends React.Component {
   _updateUsersBid = async () => {
     await getUsersBid().then((usersBidInWei) => {
       const usersBid = (usersBidInWei / 10 ** 18).toFixed(2)
-      console.log({ usersBid })
       this.setState({ usersBid })
       return usersBid
     }).catch(err => {
@@ -121,7 +110,8 @@ class App extends React.Component {
 
   _collectTokens = async () => {
     await collectTokens()
-    const tokens = await checkNumOfTokens()
+    const hui = await checkNumOfTokens()
+    const tokens = hui / (10 ** 18)
     alert(`You claimed ${tokens} tokens!`)
   }
 
