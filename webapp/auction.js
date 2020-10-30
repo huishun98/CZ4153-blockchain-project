@@ -1,7 +1,6 @@
 // import { useState, useRef, useEffect } from "react";
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
-// import Web3 from "web3";
 import { infuraWSS } from './config'
 import {
     auctionAddress, localAuctionAddress, localAccountAddress, localOwnerAddress
@@ -20,9 +19,10 @@ const contract = new web3.eth.Contract(artifact.abi, localAuctionAddress);
 
 export const startAuction = async () => {
     // Using MetaMask API to send transaction
+    console.log(ethereum.selectedAddress);
     const provider = await detectEthereumProvider();
     if (provider) {
-        return contract.methods.startAuction().send({ from: localOwnerAddress })
+        return contract.methods.startAuction().send({ from: ethereum.selectedAddress })
     } else {
         console.log("Please install MetaMask!");
     }
@@ -30,7 +30,7 @@ export const startAuction = async () => {
 export const collectTokens = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
-        return contract.methods.claimTokens().send({ from: localAccountAddress })
+        return contract.methods.claimTokens().send({ from: ethereum.selectedAddress })
     } else {
         console.log("Please install MetaMask!");
     }
@@ -64,7 +64,7 @@ export const placeBid = async (amount) => {
 export const terminateAuction = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
-        return contract.methods.terminateAuction().send({ from: localAccountAddress })
+        return contract.methods.terminateAuction().send({ from: ethereum.selectedAddress })
     } else {
         console.log("Please install MetaMask!");
     }
@@ -74,7 +74,7 @@ export const terminateAuction = async () => {
 export const checkNumOfTokens = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
-        return contract.methods.checkNumOfTokens().call({ from: localAccountAddress })
+        return contract.methods.checkNumOfTokens({ from: ethereum.selectedAddress }).call()
     } else {
         console.log("Please install MetaMask!");
     }
@@ -82,7 +82,7 @@ export const checkNumOfTokens = async () => {
 export const getUsersBid = async () => {
     const provider = await detectEthereumProvider();
     if (provider) {
-        return contract.methods.getBid().call({ from: localAccountAddress })
+        return contract.methods.totalBidAmt(ethereum.selectedAddress).call()
     } else {
         console.log("Please install MetaMask!");
     }

@@ -10,9 +10,8 @@ contract HuiToken is ERC20 {
         owner = msg.sender;
     }
 
-    function burnAllRemaining() external {
-        require(msg.sender == owner, "burner is not owner of the this token");
-        _burn(msg.sender, 0);
+    function burnTokens(uint amount) external {
+        _burn(msg.sender, amount);
     }
 
     function getTokenOwner() public view returns (address){ 

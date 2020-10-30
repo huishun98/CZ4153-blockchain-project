@@ -1,4 +1,3 @@
-const Bank = artifacts.require("Bank"); // importing artifacts from Truffle compile
 const HuiToken = artifacts.require("HuiToken");
 const Auction = artifacts.require("Auction");
 
@@ -12,5 +11,5 @@ module.exports = async function (deployer, network, accounts) {
     await deployer.deploy(Auction, huiToken.address, 10, 2);
     const auction = await Auction.deployed();
 
-    await huiToken.transfer(auction.address, '100000000000000000000')
+    await huiToken.transfer(auction.address, '100000000000000000000') // 100 tokens 
 };

@@ -12,9 +12,8 @@ contract Auction {
     uint256 public reserveRate;
     uint256 public closingRate; 
 
-    uint256 public totalPotMinTokens;
     uint256 public totalTokenBalance; 
-    uint public tokensLeft;
+    uint public totalPotMinTokens;
 
     uint256 public openingTime;
     uint256 public closingTime;
@@ -33,7 +32,7 @@ contract Auction {
     modifier atStage(Stages _stage) {
         if (stage != _stage)
             // Contract not in expected state
-            revert();
+            revert("not in correct stage");
         _;
     }
 
@@ -64,33 +63,34 @@ contract Auction {
     //     _;
     // }
 
-    // modifier checkForAuctionTimeOut() {
-    //     if (stage == Stages.AuctionStarted && now >= closingTime)
-    //         terminateAuction(); //set closing price and set stage = AuctionEnded
-    //     _;
-    // }
+    modifier checkForAuctionTimeOut() {
+        if (stage == Stages.AuctionStarted && now >= closingTime)
+            terminateAuction(); //set closing price and set stage = AuctionEnded
+        _;
+    }
 
     event BidStaked(address beneficiary, uint256 amount);
 
     constructor(HuiToken _huiToken, uint256 _openingRate, uint256 _reserveRate) public {
         require(_openingRate > 0);
         require(_reserveRate > 0);
-        // require(address(huiToken) != address(0));
 
         huiToken = _huiToken;
         owner = msg.sender; 
         wallet = address(this);
+        weiRaised = 0;
 
         openingRate = _openingRate;
         reserveRate = _reserveRate;
 
-        totalPotMinTokens = 0;
         totalTokenBalance = huiToken.balanceOf(owner);
 
         stage = Stages.AuctionDeployed;
     }
 
     function withdraw() public isOwner {
+        uint excessTokens = totalTokenBalance - totalPotMinTokens;
+        huiToken.burnTokens(excessTokens);
         msg.sender.transfer(wallet.balance);
     }
 
@@ -109,16 +109,15 @@ contract Auction {
         stage = Stages.AuctionStarted;
         openingTime = now;
         closingTime = openingTime + 20 minutes;
-        // TODO - ADD ETHEREUM ALARM CLOCK TO END FUNCTION WHEN 20 MINUTES IS UP.
-
     }
 
     function terminateAuction() internal {
         closingRate = calcCurrentTokenPrice();
+        totalPotMinTokens = weiRaised/closingRate;
         stage = Stages.AuctionEnded;
     }
 
-    function stakeBid() public payable atStage(Stages.AuctionStarted) { // checkForAuctionTimeOut
+    function stakeBid() external payable checkForAuctionTimeOut atStage(Stages.AuctionStarted){
         require(msg.sender != address(0));
         require(msg.value > 0, "amount cannot be 0 or less");
         uint256 weiAmount = msg.value;
@@ -140,18 +139,22 @@ contract Auction {
         // emit BidStaked(_beneficiary, msg.value);
     }
 
-    function getBid() public view callerIsBidding returns (uint256) { // checkForAuctionTimeOut
-        return totalBidAmt[msg.sender];
-    }
+    // function getBid() public view callerIsBidding returns (uint256) { // checkForAuctionTimeOut
+    //     return totalBidAmt[msg.sender];
+    // }
 
     function checkNumOfTokens() public view returns (uint256) { // atStage(Stages.AuctionEnded)
        return huiToken.balanceOf(msg.sender);
     }
 
-    function claimTokens() public callerIsBidding atStage(Stages.AuctionEnded) {
+    // function updatingStage() public checkForAuctionTimeOut{
+
+    // }
+
+    function claimTokens() public checkForAuctionTimeOut callerIsBidding atStage(Stages.AuctionEnded) {
         uint userBidAmt = totalBidAmt[msg.sender]; 
         totalBidAmt[msg.sender] = 0;
-        uint256 tokensOwed = userBidAmt/(10**18)/closingRate; 
+        uint256 tokensOwed = userBidAmt/closingRate; 
         huiToken.transfer(msg.sender, tokensOwed);
     }
 }

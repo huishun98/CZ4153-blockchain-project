@@ -9,13 +9,12 @@ function tokens(n) {
   return web3.utils.toWei(n, 'ether');
 }
 
-contract("Auction", async ([deployer, investor1, investor2, investor3]) => {
+contract("Auction", async ([deployer, investor1, investor2, investor3, noninvestor]) => {
   describe("auction has been deployed", async () => {
     let auction, huiToken, deploymentTime, openingTime, closingTime, afterClosingTime;
 
     before(async() => {
       deploymentTime = (await time.latest());
-      console.log(deploymentTime);
       huiToken = await HuiToken.new({from: deployer});
       auction = await Auction.new(huiToken.address, 10, 2);
       await huiToken.transfer(auction.address, tokens('100').toString(), {from: deployer})
@@ -25,20 +24,15 @@ contract("Auction", async ([deployer, investor1, investor2, investor3]) => {
       let owner = await auction.owner(); // call the getter on public state variable, https://solidity.readthedocs.io/en/v0.7.1/contracts.html#getter-functions
       assert.equal(owner, deployer); // compare the expected owner with the actual owner
     });
-  
-    it("should have token balance == total token supply", async() => {
-      let totalTokenSupply = await huiToken.totalSupply();
-      assert.equal(totalTokenSupply.toString(), tokens('100').toString());
-    });
 
-    it("should have total token supply", async() => {
+    it("should have total token balance == token supply && correctly recorded in HuiToken", async() => {
       let totalTokenBalance = await huiToken.balanceOf(auction.address);
       assert.equal(totalTokenBalance.toString(), tokens('100').toString());
     })
 
     it("should not allow non owners to start contract", async() => {
       await truffleAssert.fails(
-        auction.startAuction.call({from: investor1})
+        auction.startAuction({from: investor1})
       );
     })
 
@@ -92,11 +86,13 @@ contract("Auction", async ([deployer, investor1, investor2, investor3]) => {
 
       it("should have the correct openingTime", async() => {
         let auctionOpeningTime = await auction.openingTime();
+        console.log('auction opening time', auctionOpeningTime.toString());
         assert.equal(auctionOpeningTime.toString(), openingTime.toString());
       })
 
       it("should have the correct closingTime", async() => {
         let auctionClosingTime = await auction.closingTime();
+        console.log('auction closing time', auctionClosingTime.toString());
         assert.equal(auctionClosingTime.toString(), closingTime.toString());
       })
 
@@ -142,7 +138,7 @@ contract("Auction", async ([deployer, investor1, investor2, investor3]) => {
         it("current time should be 10 minutes after opening time", async() => {
           let now = (await time.latest());
           let tenMinsAfter = openingTime.add(time.duration.minutes(10));
-          assert(now.toString(), tenMinsAfter.toString());
+          assert.equal(now.toString(), tenMinsAfter.toString());
         })
 
         it("should have a price of 6", async() => {
@@ -161,15 +157,36 @@ contract("Auction", async ([deployer, investor1, investor2, investor3]) => {
             await time.increase(time.duration.minutes(8));
           })
 
+          it("current time should be 18 minutes after opening time", async() => {
+            let now = (await time.latest());
+            let tenMinsAfter = openingTime.add(time.duration.minutes(18));
+            assert.equal(now.toString(), tenMinsAfter.toString());
+          })
+
           it("should have a price of 3", async() => {
             let currentPrice = await auction.calcCurrentTokenPrice();
             assert.equal(currentPrice.toString(), '3');
           })
 
           it("should allow investors to still place bids", async() => {
-            await auction.stakeBid({from: investor2, value: web3.utils.toWei('30', 'ether')});
+            await auction.stakeBid({from: investor1, value: web3.utils.toWei('30', 'ether')});
             await auction.stakeBid({from: investor2, value: web3.utils.toWei('20', 'ether')});
             await auction.stakeBid({from: investor3, value: web3.utils.toWei('40', 'ether')});
+          })
+
+          it("should correctly reflect bid amount for investor1", async() => {
+            let bidAmount1 = await auction.totalBidAmt(investor1);
+            assert.equal(bidAmount1.toString(), (40 * 10**18).toString());
+          })
+
+          it("should correctly reflect bid amount for investor2", async() => {
+            let bidAmount2 = await auction.totalBidAmt(investor2);
+            assert(bidAmount2.toString(), (20 * 10**18).toString());
+          })
+
+          it("should correctly reflect bid amount for investor3", async() => {
+            let bidAmount3 = await auction.totalBidAmt(investor3);
+            assert(bidAmount3.toString(), (40 * 10**18).toString());
           })
 
           it("should not allow investors to claim tokens while auction is running", async() => {
@@ -183,10 +200,77 @@ contract("Auction", async ([deployer, investor1, investor2, investor3]) => {
               await time.increase(time.duration.minutes(3));
             })
 
-            it("should have auction stage = Stages.AuctionEnded", async() => {
-              const stage = await auction.stage();
-              assert.equal(stage.toString(), "2");
+            it("current time should be 21 minutes after opening time", async() => {
+              let now = (await time.latest());
+              let tenMinsAfter = openingTime.add(time.duration.minutes(21));
+              assert(now.toString(), tenMinsAfter.toString());
             })
+
+            it("should not allow any more staking of bids", async() => {
+              await truffleAssert.fails(
+                auction.stakeBid({from: investor3, value: web3.utils.toWei('5', 'ether')})
+              )
+              let latestStage = await auction.stage();
+              console.log(latestStage.toString());
+            })
+
+            it("should allow investors to claim tokens", async() => {
+              await truffleAssert.passes(
+                auction.claimTokens({from: investor1})
+              )
+              await truffleAssert.passes(
+                auction.claimTokens({from: investor2})
+              )
+              await truffleAssert.passes(
+                auction.claimTokens({from: investor3})
+              )
+              let latestStage = await auction.stage();
+              console.log(latestStage.toString());
+            })
+
+            it("should NOT allow NON-investors to claim tokens", async() => {
+              await truffleAssert.fails(
+                auction.claimTokens({from: noninvestor})
+              )
+            })
+
+            it("should have closing price == 2", async() => {
+              let closingRate = await auction.closingRate();
+              assert.equal(closingRate.toString(), '2');
+            })
+
+            it("should correctly reflect token ownership after claiming tokens", async() => {
+              let tokenAmount1 = await huiToken.balanceOf(investor1);
+              let tokenAmount2 = await huiToken.balanceOf(investor2);
+              let tokenAmount3 = await huiToken.balanceOf(investor3);
+              assert.equal(tokenAmount1.toString(), tokens('20').toString());
+              assert.equal(tokenAmount2.toString(), tokens('10').toString());
+              assert.equal(tokenAmount3.toString(), tokens('20').toString());
+            })
+
+            it("should correctly reflect remaining tokens left in auction contract after auction ended", async() => {
+              let tokenPMT = await auction.totalPotMinTokens();
+              let tokenSupply = await auction.totalTokenBalance();
+              let excessTokens = tokenSupply - tokenPMT;
+              assert.equal(excessTokens.toString(), tokens('50').toString());
+            })
+
+            it("should disallow withdrawal by NON-owner", async() => {
+              await truffleAssert.fails(
+                auction.withdraw({from: investor3})
+              )
+            })
+
+            it("should allow withdrawal by owner and also burn excess tokens", async() => {
+              await truffleAssert.passes(
+                auction.withdraw({from: deployer})
+              )
+
+              let auctionTokenBal = await huiToken.balanceOf(auction.address);
+              assert.equal(auctionTokenBal.toString(), '0');
+            })
+
+            
           })
 
         })
