@@ -1,16 +1,5 @@
 # CZ4153 Blockchain Project
 
-## Description
-
-This is a project for NTU's Blockchain course, CZ4153.
-
-
-## Setting up
-
-You may find the detailed set up instructions in the repository [here](https://github.com/BlockchainCourseNTU/resource/tree/master/development/hello-dapp).
-
-Remember to add a .secret file in project root containing secret phrase provided by MetaMask.
-
 Note that there are two config files, [one for the backend](config.js) located in project root, and [one for the webapp](webapp/config.js) located in the webapp folder. These credentials can be found from infura account. Detailed instructions can be found [here](https://github.com/BlockchainCourseNTU/resource/tree/master/development/hello-dapp#step-43-register-an-infura-account).
 
 For project instructions, see [ProjectA_DevProject.docx](ProjectA_DevProject.docx) located in project root.
@@ -21,8 +10,8 @@ For project instructions, see [ProjectA_DevProject.docx](ProjectA_DevProject.doc
 1. Open Ganache to start local server.
 2. In project root, run `truffle migrate`.
 3. Get contract address of 'Auction' contract and update localAuctionAddress in webapp/config.js.
-4. To start dApp, enter `webapp` directory and run `npm start`.
-5. Log into Metamask to conduct transactions.
+4. To start dApp, cd to `webapp` directory and run `npm start`.
+5. Log into Metamask to conduct transactions. Only auction contract's deployer can start the auction.
 
 
 ## Features
@@ -37,7 +26,7 @@ For project instructions, see [ProjectA_DevProject.docx](ProjectA_DevProject.doc
 3. Unsold tokens burned by owner
 4. Enforce successful bidder to pay Ether for the new token, (I.e. they can’t cancel the bid) and refund bids that are invalid using require() function
 
-See more in test/tests.js
+See more in test/tests.js for more proof of business logic functionalities 
 
 
 ## Tricky Points to Ponder
@@ -49,3 +38,4 @@ See more in test/tests.js
 
 ## Assumptions/Points to note
 1. 100 tokens are created and all 100 tokens are transferred to contract
+2. excess tokens are burnt upon withdrawal of ether from auction contract by the deployer of the contract, which can only be done after the auction has ended 

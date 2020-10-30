@@ -58,12 +58,6 @@ contract Auction {
         _;
     }
 
-    // modifier checkSupply() {
-    //     if ((weiRaised+weiAmount)/calcCurrentTokenPrice()) > totalTokenBalance)
-    //         revert();
-    //     _;
-    // }
-
     modifier checkForAuctionTimeOut() {
         if (stage == Stages.AuctionStarted && now >= closingTime)
             terminateAuction(); //set closing price and set stage = AuctionEnded
@@ -136,17 +130,11 @@ contract Auction {
             isBidding[msg.sender] = true;
             totalBidAmt[msg.sender] = msg.value;
         }
-
-        // emit BidStaked(_beneficiary, msg.value);
     }
 
     function checkNumOfTokens() public view returns (uint256) { // atStage(Stages.AuctionEnded)
        return huiToken.balanceOf(msg.sender);
     }
-
-    // function updatingStage() public checkForAuctionTimeOut{
-
-    // }
 
     function claimTokens() public checkForAuctionTimeOut callerIsBidding atStage(Stages.AuctionEnded) {
         uint userBidAmt = totalBidAmt[msg.sender]; 
