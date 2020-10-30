@@ -1,4 +1,5 @@
-pragma solidity ^0.6.2;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.4.22 <0.8.0;
 
 import "./HuiToken.sol";
 
@@ -109,12 +110,17 @@ contract Auction {
         stage = Stages.AuctionStarted;
         openingTime = now;
         closingTime = openingTime + 20 minutes;
+    
     }
 
     function terminateAuction() internal {
+        //When Auction ends, stop clock
+        //Money sent from owners to senders via Claim Tokens
+        
         closingRate = calcCurrentTokenPrice();
         totalPotMinTokens = weiRaised/closingRate;
         stage = Stages.AuctionEnded;
+        claimTokens();
     }
 
     function stakeBid() external payable checkForAuctionTimeOut atStage(Stages.AuctionStarted){
